@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase Difference Across Antennas</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+		.home-link {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: white;
+            font-weight: 600;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .home-link:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+        .subtitle {
+            text-align: center;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        .canvas-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        canvas {
+            display: block;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            width: 100%;
+        }
+        .canvas-wrapper {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 15px;
+        }
+        .canvas-title {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .control-group {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .control-group h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin: 15px 0 5px;
+            font-weight: 500;
+            font-size: 0.95em;
+        }
+        input[type="range"] {
+            width: 100%;
+            margin: 5px 0;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        .value-display {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+        .info-box {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+        .phase-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            font-size: 0.9em;
+        }
+		footer {
+            margin-top: 20px;
+			border-radius: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-align: center;
+            padding: 15px;
+            font-size: 1em;
+        }
+		.copyleft {
+			display:inline-block;
+			transform: rotate(180deg);
+		}
+    </style>
+</head>
+<body>
+    <div class="container">
+	<a href="index.html" class="home-link">
+            <span>🏠</span>
+            <span>Home</span>
+        </a>
+        <h1>📡 Phase Differences Across Antenna Array</h1>
+        <p class="subtitle">How the same signal arrives with different phases at each antenna</p>
+        
+        <div class="canvas-container">
+            <div class="canvas-wrapper">
+                <div class="canvas-title">📍 Spatial View - Signal Propagation</div>
+                <canvas id="spatialCanvas" width="650" height="450"></canvas>
+                <div class="phase-legend">
+                    <span>🔴 Path to Ant 1 (Reference: φ = 0°)</span>
+                    <span>🟠 Path to Ant 2</span>
+                    <span>🟡 Path to Ant 3</span>
+                    <span>🟢 Path to Ant 4</span>
+                </div>
+            </div>
+            
+            <div class="canvas-wrapper">
+                <div class="canvas-title">📊 Phase View - Received Signals</div>
+                <canvas id="phaseCanvas" width="650" height="450"></canvas>
+                <div class="phase-legend">
+                    <span>Each sine wave shows the signal at one antenna</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <h3>🎯 Array Configuration</h3>
+                <label>
+                    Number of Antennas: <span class="value-display" id="antennaCount">4</span>
+                </label>
+                <input type="range" id="antennas" min="2" max="8" value="4" step="1">
+                
+                <label>
+                    Antenna Spacing (λ): <span class="value-display" id="spacingValue">0.50</span>
+                </label>
+                <input type="range" id="spacing" min="0.25" max="2.0" value="0.5" step="0.05">
+            </div>
+
+            <div class="control-group">
+                <h3>📐 Signal Direction</h3>
+                <label>
+                    Angle of Arrival: <span class="value-display" id="aoaValue">45°</span>
+                </label>
+                <input type="range" id="aoa" min="-90" max="90" value="45" step="1">
+                
+                <label>
+                    Frequency: <span class="value-display" id="freqValue">2.4 GHz</span>
+                </label>
+                <input type="range" id="freq" min="1" max="6" value="2.4" step="0.1">
+            </div>
+
+            <div class="control-group">
+                <h3>⏱️ Animation</h3>
+                <label>
+                    Time: <span class="value-display" id="timeValue">0.0 ns</span>
+                </label>
+                <input type="range" id="time" min="0" max="175" value="0" step="1">
+                
+                <button id="animate">▶️ Play Animation</button>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <strong>🔍 What you're seeing:</strong><br><br>
+            
+            <strong>Left Panel (Spatial View):</strong> Shows the physical signal arriving at the antenna array. The colored lines represent wavefronts traveling from the transmitter. Notice how the signal reaches different antennas at slightly different times due to the extra distance it must travel.<br><br>
+            
+            <strong>Right Panel (Phase View):</strong> Shows the actual received signal at each antenna as a sine wave. The horizontal offset between waves represents the phase difference. When the Angle of Arrival (AoA) is 0°, all antennas receive the signal in phase. As the angle changes, you'll see increasing phase shifts between antennas.<br><br>
+            
+            <strong>Key Insight:</strong> Phase difference Δφ = (2π × d × sin(θ)) / λ, where d is antenna spacing, θ is AoA, and λ is wavelength. This phase difference is what allows the array to determine the direction of arrival and perform beamforming!
+        </div>
+		<footer>
+            <p><span class="copyleft">&copy;</span> 2025 Eleni Gkiouzepi. GNU General Public License with attribution and proper citation required.</p>
+        </footer>
+    </div>
+
+    <script>
+        const spatialCanvas = document.getElementById('spatialCanvas');
+        const phaseCanvas = document.getElementById('phaseCanvas');
+        const sCtx = spatialCanvas.getContext('2d');
+        const pCtx = phaseCanvas.getContext('2d');
+        
+        let numAntennas = 4;
+        let antennaSpacing = 0.5; // in wavelengths
+        let aoa = 45; // degrees
+        let frequency = 2.4; // GHz
+        let time = 0;
+        let animating = false;
+        let animationId = null;
+
+        const c = 3e8; // speed of light m/s
+        
+        function getWavelength() {
+            return c / (frequency * 1e9); // meters
+        }
+
+        function drawSpatialView() {
+            const w = spatialCanvas.width;
+            const h = spatialCanvas.height;
+            
+            sCtx.fillStyle = '#f8f9fa';
+            sCtx.fillRect(0, 0, w, h);
+            
+            // Calculate array center and positions
+            const arrayX = w - 300;
+            const arrayY = h / 2;
+            const pixelsPerWavelength = 120;
+            const totalArrayHeight = (numAntennas - 1) * antennaSpacing * pixelsPerWavelength;
+            
+            // Draw coordinate system
+            sCtx.strokeStyle = '#e0e0e0';
+            sCtx.lineWidth = 1;
+            sCtx.setLineDash([5, 5]);
+            sCtx.beginPath();
+            sCtx.moveTo(0, arrayY);
+            sCtx.lineTo(w, arrayY);
+            sCtx.stroke();
+            sCtx.beginPath();
+            sCtx.moveTo(arrayX, 0);
+            sCtx.lineTo(arrayX, h);
+            sCtx.stroke();
+            sCtx.setLineDash([]);
+            
+            // Calculate antenna positions
+            const antennas = [];
+            const startY = arrayY - totalArrayHeight / 2;
+            for (let i = 0; i < numAntennas; i++) {
+                antennas.push({
+                    x: arrayX,
+                    y: startY + i * antennaSpacing * pixelsPerWavelength,
+                    index: i
+                });
+            }
+            
+            // Draw incoming wavefronts
+            const aoaRad = (aoa * Math.PI) / 180;
+            const waveDirection = { x: Math.cos(aoaRad + Math.PI), y: Math.sin(aoaRad + Math.PI) };
+            const perpDirection = { x: -waveDirection.y, y: waveDirection.x };
+            
+            const wavelengthPixels = pixelsPerWavelength;
+            const numWaves = 16;
+            const phaseShift = (50 + time / 100) * 2 * Math.PI;
+            
+            for (let wP = 0; wP < numWaves; wP++) {
+                const wavePhase = wP * 2 * Math.PI / 4 + phaseShift;
+                const alpha = 0.3 + 0.4 * (Math.sin(wavePhase) * 0.5 + 0.5);
+                
+                sCtx.strokeStyle = `rgba(52, 152, 219, ${alpha})`;
+                sCtx.lineWidth = 3;
+                sCtx.beginPath();
+                
+                const baseOffset = (-wP + time / 100 + 2) * wavelengthPixels;
+                const centerX = arrayX  + waveDirection.x * baseOffset;
+                const centerY = arrayY  + waveDirection.y * baseOffset;
+                
+				const lineLength = 3*w;
+                const startX = centerX + perpDirection.x * lineLength;
+                const startY = centerY + perpDirection.y * lineLength;
+                const endX = centerX - perpDirection.x * lineLength;
+                const endY = centerY - perpDirection.y * lineLength;
+                
+                sCtx.moveTo(startX, startY);
+                sCtx.lineTo(endX, endY);
+                sCtx.stroke();
+            }
+            
+            // Draw array bracket
+            sCtx.strokeStyle = '#34495e';
+            sCtx.lineWidth = 2;
+            sCtx.beginPath();
+            sCtx.moveTo(arrayX + 35, antennas[0].y);
+            sCtx.lineTo(arrayX + 55, antennas[0].y);
+            sCtx.lineTo(arrayX + 55, antennas[numAntennas - 1].y);
+            sCtx.lineTo(arrayX + 35, antennas[numAntennas - 1].y);
+            sCtx.stroke();
+            
+            // Draw antennas with different colors and path lines
+            const colors = ['#e74c3c', '#e67e22', '#f39c12', '#27ae60', '#3498db', '#9b59b6', '#e91e63', '#00bcd4'];
+            
+            antennas.forEach((ant, idx) => {
+                const color = colors[idx % colors.length];
+                
+                // Calculate phase difference for this antenna
+                const pathDiff = idx * antennaSpacing * Math.sin(aoaRad); // in wavelengths
+                const phaseDiff = pathDiff * 2 * Math.PI;
+                
+                // Draw path line from signal direction
+                sCtx.strokeStyle = color;
+                sCtx.lineWidth = 2;
+                sCtx.setLineDash([5, 5]);
+                sCtx.beginPath();
+                const pathStartX = ant.x + waveDirection.x * 500;
+                const pathStartY = ant.y + waveDirection.y * 500;
+                sCtx.moveTo(pathStartX, pathStartY);
+                sCtx.lineTo(ant.x, ant.y);
+                sCtx.stroke();
+                sCtx.setLineDash([]);
+                
+                // Draw antenna
+                sCtx.fillStyle = color;
+                sCtx.beginPath();
+                sCtx.arc(ant.x, ant.y, 10, 0, 2 * Math.PI);
+                sCtx.fill();
+                sCtx.strokeStyle = '#2c3e50';
+                sCtx.lineWidth = 2;
+                sCtx.stroke();
+                
+                // Label
+                sCtx.fillStyle = '#2c3e50';
+                sCtx.font = 'bold 16px Arial';
+                sCtx.fillText(`${idx + 1}`, ant.x + 20, ant.y + 6);
+                
+                // Phase difference label
+                sCtx.font = '14px Arial';
+                sCtx.fillText(`Δφ = ${(phaseDiff * 180 / Math.PI).toFixed(1)}°`, ant.x + 65, ant.y + 6);
+            });
+            
+            // Draw AoA indicator
+            sCtx.strokeStyle = '#e74c3c';
+            sCtx.lineWidth = 3;
+            sCtx.beginPath();
+            const arrowStart = { x: arrayX - 80, y: arrayY };
+            const arrowEnd = { 
+                x: arrowStart.x + Math.cos(aoaRad + Math.PI) * 60,
+                y: arrowStart.y + Math.sin(aoaRad + Math.PI) * 60
+            };
+            sCtx.moveTo(arrowStart.x, arrowStart.y);
+            sCtx.lineTo(arrowEnd.x, arrowEnd.y);
+            sCtx.stroke();
+            
+            // Arrow head
+            const arrowAngle = Math.atan2(arrowEnd.y - arrowStart.y, arrowEnd.x - arrowStart.x);
+            sCtx.beginPath();
+            sCtx.moveTo(arrowStart.x, arrowStart.y);
+            sCtx.lineTo(arrowStart.x + 10 * Math.cos(arrowAngle - 0.3), arrowStart.y + 10 * Math.sin(arrowAngle - 0.3));
+            sCtx.moveTo(arrowStart.x, arrowStart.y);
+            sCtx.lineTo(arrowStart.x + 10 * Math.cos(arrowAngle + 0.3), arrowStart.y + 10 * Math.sin(arrowAngle + 0.3));
+            sCtx.stroke();
+            
+            // AoA arc
+            sCtx.strokeStyle = '#e74c3c';
+            sCtx.lineWidth = 10;
+            sCtx.beginPath();
+            sCtx.arc(arrowStart.x, arrowStart.y, 30, Math.PI, aoaRad + Math.PI, aoaRad < 0);
+            sCtx.stroke();
+            
+            sCtx.fillStyle = '#000000';
+            sCtx.font = 'bold 14px Arial';
+            sCtx.fillText(`AoA: ${aoa}°`, arrowStart.x - 115, arrowStart.y);
+            
+            // Add spacing indicator
+            if (numAntennas > 1) {
+                sCtx.strokeStyle = '#7f8c8d';
+                sCtx.lineWidth = 1;
+                sCtx.setLineDash([3, 3]);
+                const midAnt = Math.floor(numAntennas / 2);
+                if (midAnt > 0) {
+                    const y1 = antennas[midAnt - 1].y;
+                    const y2 = antennas[midAnt].y;
+                    sCtx.beginPath();
+                    sCtx.moveTo(arrayX , y1);
+                    sCtx.lineTo(arrayX , y2);
+                    sCtx.stroke();
+                    
+                    sCtx.fillStyle = '#7f8c8d';
+                    sCtx.font = '14px Arial';
+                    sCtx.fillText(`d = ${antennaSpacing}λ`, arrayX - 12, (y1 + y2) / 2 + 4);
+                }
+                sCtx.setLineDash([]);
+            }
+        }
+
+        function drawPhaseView() {
+            const w = phaseCanvas.width;
+            const h = phaseCanvas.height;
+            
+            pCtx.fillStyle = '#f8f9fa';
+            pCtx.fillRect(0, 0, w, h);
+            
+            // Draw grid
+            pCtx.strokeStyle = '#e0e0e0';
+            pCtx.lineWidth = 1;
+            for (let x = 50; x < w; x += 50) {
+                pCtx.beginPath();
+                pCtx.moveTo(x, 0);
+                pCtx.lineTo(x, h);
+                pCtx.stroke();
+            }
+            
+            const colors = ['#e74c3c', '#e67e22', '#f39c12', '#27ae60', '#3498db', '#9b59b6', '#e91e63', '#00bcd4'];
+            const aoaRad = (aoa * Math.PI) / 180;
+            //const heightPerAntenna = Math.min(100, (h - 100) / numAntennas);
+			const heightPerAntenna = Math.min(100, (h - 100) / numAntennas);
+            const amplitude = heightPerAntenna * 0.35;
+            
+			// Calculate array center and positions
+            const arrayY = h / 2;
+            const totalArrayHeight = (numAntennas-1) * heightPerAntenna;
+			
+            // Draw phase reference lines
+            pCtx.strokeStyle = '#bdc3c7';
+            pCtx.lineWidth = 1;
+            pCtx.setLineDash([2, 2]);
+			const startY = arrayY - totalArrayHeight/2;
+            for (let i = 0; i < numAntennas; i++) {
+                const centerY = startY + i * heightPerAntenna;
+                pCtx.beginPath();
+                pCtx.moveTo(0, centerY);
+                pCtx.lineTo(w, centerY);
+                pCtx.stroke();
+            }
+            pCtx.setLineDash([]);
+            
+            // Draw sine waves for each antenna
+            const cycles = 3;
+            const timePhase = (time / 100) * 2 * Math.PI;
+            
+            for (let i = 0; i < numAntennas; i++) {
+                const color = colors[i % colors.length];
+                const centerY = startY + i * heightPerAntenna;
+                
+                // Calculate phase offset due to spatial delay
+                const pathDiff = i * antennaSpacing * Math.sin(aoaRad); // in wavelengths
+                const spatialPhase = pathDiff * 2 * Math.PI;
+                
+                // Draw sine wave
+                pCtx.strokeStyle = color;
+                pCtx.lineWidth = 3;
+                pCtx.beginPath();
+                for (let x = 0; x < w; x++) {
+                    const t = (x / w) * cycles * 2 * Math.PI;
+                    const y = centerY + amplitude * Math.sin(t + timePhase - spatialPhase);
+                    if (x === 0) pCtx.moveTo(x, y);
+                    else pCtx.lineTo(x, y);
+                }
+                pCtx.stroke();
+                
+                // Draw phase marker at current time
+                const markerX = w * 0.15;
+                const markerY = centerY + amplitude * Math.sin((markerX / w) * cycles * 2 * Math.PI + timePhase - spatialPhase);
+                pCtx.fillStyle = color;
+                pCtx.beginPath();
+                pCtx.arc(markerX, markerY, 6, 0, 2 * Math.PI);
+                pCtx.fill();
+                pCtx.strokeStyle = '#2c3e50';
+                pCtx.lineWidth = 2;
+                pCtx.stroke();
+                
+                // Draw vertical line from marker to center
+                pCtx.strokeStyle = color + '40';
+                pCtx.lineWidth = 1;
+                pCtx.setLineDash([3, 3]);
+                pCtx.beginPath();
+                pCtx.moveTo(markerX, centerY);
+                pCtx.lineTo(markerX, markerY);
+                pCtx.stroke();
+                pCtx.setLineDash([]);
+                
+                // Label antenna
+                pCtx.fillStyle = '#2c3e50';
+                pCtx.font = 'bold 14px Arial';
+                pCtx.fillText(`Antenna ${i + 1}`, 10, centerY - amplitude - 5);
+                
+                // Phase difference
+                pCtx.font = '12px Arial';
+                const phaseDeg = (spatialPhase * 180 / Math.PI) % 360;
+                pCtx.fillText(`Phase: ${phaseDeg.toFixed(1)}°`, 120, centerY - amplitude - 5);
+                
+                // Signal strength indicator
+                const instantValue = Math.sin(timePhase - spatialPhase);
+                pCtx.fillStyle = color;
+                pCtx.fillText(`Value: ${instantValue.toFixed(3)}`, 250, centerY - amplitude - 5);
+            }
+            
+            // Draw phase alignment indicator
+            const totalPhaseSpread = (numAntennas - 1) * antennaSpacing * Math.sin(aoaRad) * 360;
+            pCtx.fillStyle = '#2c3e50';
+            pCtx.font = 'bold 16px Arial';
+            pCtx.fillText(`Total Phase Spread: ${totalPhaseSpread.toFixed(1)}°`, w / 2 - 100, h - 20);
+            
+            // Time axis
+            pCtx.fillStyle = '#7f8c8d';
+            pCtx.font = '12px Arial';
+            pCtx.fillText('Time →', w - 60, h - 20);
+        }
+
+        function draw() {
+            drawSpatialView();
+            drawPhaseView();
+        }
+
+        function animate() {
+            if (!animating) return;
+            time = (time + 1) % 100;
+            document.getElementById('time').value = time;
+            document.getElementById('timeValue').textContent = (time * 0.417).toFixed(1) + ' ns';
+            draw();
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // Event listeners
+        document.getElementById('antennas').addEventListener('input', (e) => {
+            numAntennas = parseInt(e.target.value);
+            document.getElementById('antennaCount').textContent = numAntennas;
+            draw();
+        });
+
+        document.getElementById('spacing').addEventListener('input', (e) => {
+            antennaSpacing = parseFloat(e.target.value);
+            document.getElementById('spacingValue').textContent = antennaSpacing.toFixed(2);
+            draw();
+        });
+
+        document.getElementById('aoa').addEventListener('input', (e) => {
+            aoa = parseInt(e.target.value);
+            document.getElementById('aoaValue').textContent = aoa + '°';
+            draw();
+        });
+
+        document.getElementById('freq').addEventListener('input', (e) => {
+            frequency = parseFloat(e.target.value);
+            document.getElementById('freqValue').textContent = frequency.toFixed(1) + ' GHz';
+            draw();
+        });
+
+        document.getElementById('time').addEventListener('input', (e) => {
+            time = parseInt(e.target.value);
+            document.getElementById('timeValue').textContent = (time * 0.417).toFixed(1) + ' ns';
+            if (!animating) draw();
+        });
+
+        document.getElementById('animate').addEventListener('click', (e) => {
+            animating = !animating;
+            e.target.textContent = animating ? '⏸️ Pause Animation' : '▶️ Play Animation';
+            if (animating) animate();
+            else if (animationId) cancelAnimationFrame(animationId);
+        });
+
+        draw();
+    </script>
+</body>
+</html>

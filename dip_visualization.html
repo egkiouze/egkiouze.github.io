@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delay Intensity Profile</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a237e 0%, #283593 50%, #3f51b5 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+		.home-link {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: white;
+            font-weight: 600;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .home-link:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.2em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .subtitle {
+            text-align: center;
+            opacity: 0.9;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+        .canvas-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .canvas-wrapper {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        .canvas-title {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.15em;
+            color: #ffeb3b;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+        .control-group {
+            background: rgba(255, 255, 255, 0.12);
+            padding: 20px;
+            border-radius: 12px;
+        }
+        .control-group h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.15em;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin: 15px 0 5px;
+            font-weight: 500;
+            font-size: 0.95em;
+        }
+        input[type="range"] {
+            width: 100%;
+            margin: 8px 0;
+        }
+        button {
+            background: linear-gradient(135deg, #ff6f00 0%, #ff8f00 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 10px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 111, 0, 0.5);
+        }
+        .value-display {
+            display: inline-block;
+            background: rgba(255, 111, 0, 0.3);
+            padding: 3px 10px;
+            border-radius: 5px;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+        .info-box {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 18px;
+            border-radius: 10px;
+            margin-top: 25px;
+            font-size: 0.9em;
+            line-height: 1.7;
+            border-left: 4px solid #ff6f00;
+        }
+        .formula {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            font-size: 1.1em;
+        }
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            font-size: 0.9em;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 12px;
+            border-radius: 6px;
+        }
+		footer {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 18px;
+            border-radius: 10px;
+            margin-top: 25px;
+            color: white;
+            text-align: center;
+            font-size: 1em;
+        }
+		.copyleft {
+			display:inline-block;
+			transform: rotate(180deg);
+		}
+    </style>
+</head>
+<body>
+    <div class="container">
+	        <a href="index.html" class="home-link">
+            <span>🏠</span>
+            <span>Home</span>
+        </a>
+        <h1>📡 Delay Intensity Profile (DIP) for Multipath Channels</h1>
+        <p class="subtitle">Exponential Power Delay Profile in Continuous and Discrete Time</p>
+        
+        <div class="canvas-grid">
+            <div class="canvas-wrapper">
+                <div class="canvas-title">🌊 Continuous Time DIP</div>
+                <canvas id="continuousCanvas" width="700" height="500"></canvas>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div style="width: 20px; height: 3px; background: #2196f3;"></div>
+                        <span>Exponential Envelope</span>
+                    </div>
+                    <div class="legend-item">
+                        <div style="width: 20px; height: 3px; background: #f44336;"></div>
+                        <span>Individual Paths</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="canvas-wrapper">
+                <div class="canvas-title">📊 Discrete Time DIP (Sampled)</div>
+                <canvas id="discreteCanvas" width="700" height="500"></canvas>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div style="width: 15px; height: 15px; background: #4caf50;"></div>
+                        <span>Sampled Taps</span>
+                    </div>
+                    <div class="legend-item">
+                        <div style="width: 15px; height: 15px; background: #ff9800;"></div>
+                        <span>Path Contributions</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <h3>📶 Channel Parameters</h3>
+                <label>
+                    RMS Delay Spread (τ_rms): <span class="value-display" id="rmsValue">50 ns</span>
+                </label>
+                <input type="range" id="rmsDelay" min="10" max="200" value="50" step="5">
+                
+                <label>
+                    Maximum Delay: <span class="value-display" id="maxDelayValue">500 ns</span>
+                </label>
+                <input type="range" id="maxDelay" min="100" max="1000" value="500" step="50">
+                
+                <label>
+                    Number of Paths: <span class="value-display" id="numPathsValue">15</span>
+                </label>
+                <input type="range" id="numPaths" min="1" max="30" value="15" step="1">
+            </div>
+
+            <div class="control-group">
+                <h3>⚙️ Sampling Parameters</h3>
+                <label>
+                    Sampling Rate: <span class="value-display" id="sampleRateValue">20 MHz</span>
+                </label>
+                <input type="range" id="sampleRate" min="5" max="100" value="20" step="5">
+                
+                <label>
+                    Number of Taps: <span class="value-display" id="numTapsValue">10</span>
+                </label>
+                <input type="range" id="numTaps" min="1" max="20" value="10" step="1">
+                
+                <button id="regenerate">🔄 Regenerate Random Paths</button>
+            </div>
+
+            <div class="control-group">
+                <h3>📈 Visualization Options</h3>
+                <label>
+                    <input type="checkbox" id="showEnvelope" checked> Show Exponential Envelope
+                </label>
+                <label>
+                    <input type="checkbox" id="showPaths" checked> Show Individual Paths
+                </label>
+                <label>
+                    <input type="checkbox" id="showGrid" checked> Show Grid
+                </label>
+                <label>
+                    <input type="checkbox" id="logScale"> Logarithmic Scale (dB)
+                </label>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <strong>📖 Understanding the Delay Intensity Profile (DIP):</strong><br><br>
+            
+            The <strong>Delay Intensity Profile</strong> describes how signal power is distributed across different propagation delays in a multipath channel. 
+            The <strong>exponential DIP</strong> is a common model where path power decays exponentially with delay:<br>
+            
+            <div class="formula">
+                P(τ) = P₀ · exp(-τ / τ_rms)
+            </div>
+            
+            where <strong>τ_rms</strong> is the RMS delay spread, a key parameter that characterizes channel dispersion.<br><br>
+            
+            <strong>Left Panel (Continuous Time):</strong> Shows the idealized continuous power delay profile. The blue curve represents the exponential envelope, 
+            while red impulses show individual multipath components that arrive at different delays with powers following the exponential decay.<br><br>
+            
+            <strong>Right Panel (Discrete Time):</strong> Shows how the channel is represented in practical digital systems. The continuous channel is sampled at regular 
+            intervals (sample period T_s = 1/f_s). Multiple paths arriving within one sample period are combined into a single discrete "tap" (green bars). 
+            Orange markers show where individual paths contribute to each tap.<br><br>
+            
+            <strong>Key Concepts:</strong><br>
+            • <strong>RMS Delay Spread</strong>: Determines how quickly power decays with delay (smaller = faster decay)<br>
+            • <strong>Sampling Rate</strong>: Higher rates provide better time resolution but more taps<br>
+            • <strong>Tap Aggregation</strong>: Paths within one sample period combine coherently at each tap<br>
+            • <strong>ISI (Inter-Symbol Interference)</strong>: Multiple taps cause symbols to spread in time, requiring equalization
+        </div>
+		<footer>
+            <p><span class="copyleft">&copy;</span> 2025 Eleni Gkiouzepi. GNU General Public License with attribution and proper citation required.</p>
+        </footer>
+    </div>
+
+    <script>
+        const ctxCont = document.getElementById('continuousCanvas').getContext('2d');
+        const ctxDisc = document.getElementById('discreteCanvas').getContext('2d');
+        
+        let config = {
+            rmsDelay: 50,        // nanoseconds
+            maxDelay: 500,       // nanoseconds
+            numPaths: 15,
+            sampleRate: 20,      // MHz
+            numTaps: 10,
+            showEnvelope: true,
+            showPaths: true,
+            showGrid: true,
+            logScale: false
+        };
+        
+        let paths = [];
+        
+        // Generate random multipath components
+        function generatePaths() {
+            paths = [];
+            const tau_rms = config.rmsDelay;
+            const maxDelay = config.maxDelay;
+            
+            for (let i = 0; i < config.numPaths; i++) {
+                // Generate delay from exponential distribution
+                const u = Math.random();
+                const delay = -tau_rms * Math.log(1 - u * (1 - Math.exp(-maxDelay / tau_rms)));
+                
+                // Power follows exponential decay
+                const power = Math.exp(-delay / tau_rms);
+                
+                // Random phase
+                const phase = Math.random() * 2 * Math.PI;
+                
+                paths.push({ delay, power, phase });
+            }
+            
+            // Sort by delay
+            paths.sort((a, b) => a.delay - b.delay);
+            
+            // Normalize so first path has power 1
+            const maxPower = Math.max(...paths.map(p => p.power));
+            paths.forEach(p => p.power /= maxPower);
+        }
+        
+        // Draw continuous time DIP
+        function drawContinuous() {
+            const canvas = ctxCont.canvas;
+            const w = canvas.width;
+            const h = canvas.height;
+            const margin = { top: 40, right: 40, bottom: 60, left: 70 };
+            const plotW = w - margin.left - margin.right;
+            const plotH = h - margin.top - margin.bottom;
+            
+            // Clear
+            ctxCont.fillStyle = '#f8f9fa';
+            ctxCont.fillRect(0, 0, w, h);
+            
+            // Draw grid
+            if (config.showGrid) {
+                ctxCont.strokeStyle = '#e0e0e0';
+                ctxCont.lineWidth = 1;
+                
+                for (let i = 0; i <= 10; i++) {
+                    const x = margin.left + (plotW * i / 10);
+                    const y = margin.top + (plotH * i / 10);
+                    
+                    ctxCont.beginPath();
+                    ctxCont.moveTo(x, margin.top);
+                    ctxCont.lineTo(x, margin.top + plotH);
+                    ctxCont.stroke();
+                    
+                    ctxCont.beginPath();
+                    ctxCont.moveTo(margin.left, y);
+                    ctxCont.lineTo(margin.left + plotW, y);
+                    ctxCont.stroke();
+                }
+            }
+            
+            // Draw axes
+            ctxCont.strokeStyle = '#333';
+            ctxCont.lineWidth = 2;
+            ctxCont.beginPath();
+            ctxCont.moveTo(margin.left, margin.top);
+            ctxCont.lineTo(margin.left, margin.top + plotH);
+            ctxCont.lineTo(margin.left + plotW, margin.top + plotH);
+            ctxCont.stroke();
+            
+            // Draw exponential envelope
+            if (config.showEnvelope) {
+                ctxCont.strokeStyle = '#2196f3';
+                ctxCont.lineWidth = 3;
+                ctxCont.beginPath();
+                
+                for (let i = 0; i <= plotW; i++) {
+                    const delay = (i / plotW) * config.maxDelay;
+                    let power = Math.exp(-delay / config.rmsDelay);
+                    
+                    if (config.logScale) {
+                        power = 20 * Math.log10(power + 1e-10);
+                        power = (power + 60) / 60; // Normalize to 0-1 for -60dB to 0dB
+                        power = Math.max(0, power);
+                    }
+                    
+                    const x = margin.left + i;
+                    const y = margin.top + plotH - (power * plotH);
+                    
+                    if (i === 0) ctxCont.moveTo(x, y);
+                    else ctxCont.lineTo(x, y);
+                }
+                ctxCont.stroke();
+            }
+            
+            // Draw individual paths
+            if (config.showPaths) {
+                paths.forEach(path => {
+                    let power = path.power;
+                    
+                    if (config.logScale) {
+                        power = 20 * Math.log10(power + 1e-10);
+                        power = (power + 60) / 60;
+                        power = Math.max(0, power);
+                    }
+                    
+                    const x = margin.left + (path.delay / config.maxDelay) * plotW;
+                    const y = margin.top + plotH - (power * plotH);
+                    
+                    // Draw triangular spike (sinc-like impulse response)
+                    const spikeWidth = plotW * 10 / config.maxDelay; // Width in pixels
+                    
+                    ctxCont.fillStyle = 'rgba(244, 67, 54, 0.3)';
+                    ctxCont.strokeStyle = '#f44336';
+                    ctxCont.lineWidth = 2;
+                    
+                    // Draw filled triangle
+                    ctxCont.beginPath();
+                    ctxCont.moveTo(x - spikeWidth, margin.top + plotH);
+                    ctxCont.lineTo(x, y);
+                    ctxCont.lineTo(x + spikeWidth, margin.top + plotH);
+                    ctxCont.closePath();
+                    ctxCont.fill();
+                    ctxCont.stroke();
+                    
+                    // Draw peak marker
+                    ctxCont.fillStyle = '#f44336';
+                    ctxCont.beginPath();
+                    ctxCont.arc(x, y, 5, 0, 2 * Math.PI);
+                    ctxCont.fill();
+                    
+                    // Draw stem line for clarity
+                    ctxCont.strokeStyle = '#d32f2f';
+                    ctxCont.lineWidth = 2;
+                    ctxCont.setLineDash([3, 3]);
+                    ctxCont.beginPath();
+                    ctxCont.moveTo(x, margin.top + plotH);
+                    ctxCont.lineTo(x, y);
+                    ctxCont.stroke();
+                    ctxCont.setLineDash([]);
+                });
+            }
+            
+            // Labels
+            ctxCont.fillStyle = '#333';
+            ctxCont.font = 'bold 14px Arial';
+            ctxCont.textAlign = 'center';
+            ctxCont.fillText('Delay τ (ns)', margin.left + plotW / 2, h - 20);
+            
+            ctxCont.save();
+            ctxCont.translate(20, margin.top + plotH / 2);
+            ctxCont.rotate(-Math.PI / 2);
+            ctxCont.fillText(config.logScale ? 'Power (dB)' : 'Power (normalized)', 0, 0);
+            ctxCont.restore();
+            
+            // X-axis ticks
+            ctxCont.font = '12px Arial';
+            ctxCont.textAlign = 'center';
+            for (let i = 0; i <= 5; i++) {
+                const x = margin.left + (plotW * i / 5);
+                const label = Math.round(config.maxDelay * i / 5);
+                ctxCont.fillText(label.toString(), x, h - 35);
+            }
+            
+            // Y-axis ticks
+            ctxCont.textAlign = 'right';
+            for (let i = 0; i <= 5; i++) {
+                const y = margin.top + plotH - (plotH * i / 5);
+                let label;
+                if (config.logScale) {
+                    label = -60 + (60 * i / 5);
+                    ctxCont.fillText(label.toFixed(0), margin.left - 10, y + 4);
+                } else {
+                    label = i / 5;
+                    ctxCont.fillText(label.toFixed(1), margin.left - 10, y + 4);
+                }
+            }
+        }
+        
+        // Draw discrete time DIP
+        function drawDiscrete() {
+            const canvas = ctxDisc.canvas;
+            const w = canvas.width;
+            const h = canvas.height;
+            const margin = { top: 40, right: 40, bottom: 60, left: 70 };
+            const plotW = w - margin.left - margin.right;
+            const plotH = h - margin.top - margin.bottom;
+            
+            // Clear
+            ctxDisc.fillStyle = '#f8f9fa';
+            ctxDisc.fillRect(0, 0, w, h);
+            
+            // Calculate sample period
+            const samplePeriod = 1000 / config.sampleRate; // nanoseconds
+            
+            // Create discrete taps
+            const taps = new Array(config.numTaps).fill(0).map(() => ({ power: 0, pathsInTap: [] }));
+            
+            paths.forEach(path => {
+                const tapIndex = Math.floor(path.delay / samplePeriod);
+                if (tapIndex < config.numTaps) {
+                    // Power adds (incoherent combining for visualization)
+                    taps[tapIndex].power += path.power;
+                    taps[tapIndex].pathsInTap.push(path);
+                }
+            });
+            
+            // Normalize taps
+            const maxTapPower = Math.max(...taps.map(t => t.power), 0.001);
+            taps.forEach(t => t.power /= maxTapPower);
+            
+            // Draw grid
+            if (config.showGrid) {
+                ctxDisc.strokeStyle = '#e0e0e0';
+                ctxDisc.lineWidth = 1;
+                
+                for (let i = 0; i <= 10; i++) {
+                    const x = margin.left + (plotW * i / 10);
+                    const y = margin.top + (plotH * i / 10);
+                    
+                    ctxDisc.beginPath();
+                    ctxDisc.moveTo(x, margin.top);
+                    ctxDisc.lineTo(x, margin.top + plotH);
+                    ctxDisc.stroke();
+                    
+                    ctxDisc.beginPath();
+                    ctxDisc.moveTo(margin.left, y);
+                    ctxDisc.lineTo(margin.left + plotW, y);
+                    ctxDisc.stroke();
+                }
+            }
+            
+            // Draw axes
+            ctxDisc.strokeStyle = '#333';
+            ctxDisc.lineWidth = 2;
+            ctxDisc.beginPath();
+            ctxDisc.moveTo(margin.left, margin.top);
+            ctxDisc.lineTo(margin.left, margin.top + plotH);
+            ctxDisc.lineTo(margin.left + plotW, margin.top + plotH);
+            ctxDisc.stroke();
+            
+            // Draw taps
+            const barWidth = plotW / config.numTaps * 0.7;
+            taps.forEach((tap, i) => {
+                let power = tap.power;
+                
+                if (config.logScale) {
+                    power = 20 * Math.log10(power + 1e-10);
+                    power = (power + 60) / 60;
+                    power = Math.max(0, power);
+                }
+                
+                const x = margin.left + (i + 0.5) * (plotW / config.numTaps);
+                const barHeight = power * plotH;
+                const y = margin.top + plotH - barHeight;
+                
+                // Draw bar
+                ctxDisc.fillStyle = '#4caf50';
+                ctxDisc.strokeStyle = '#2e7d32';
+                ctxDisc.lineWidth = 2;
+                ctxDisc.fillRect(x - barWidth / 2, y, barWidth, barHeight);
+                ctxDisc.strokeRect(x - barWidth / 2, y, barWidth, barHeight);
+                
+                // Draw contributing paths
+                tap.pathsInTap.forEach(path => {
+                    let pathPower = path.power / maxTapPower;
+                    
+                    if (config.logScale) {
+                        pathPower = 20 * Math.log10(pathPower + 1e-10);
+                        pathPower = (pathPower + 60) / 60;
+                        pathPower = Math.max(0, pathPower);
+                    }
+                    
+                    const py = margin.top + plotH - (pathPower * plotH);
+                    
+                    ctxDisc.fillStyle = '#ff9800';
+                    ctxDisc.beginPath();
+                    ctxDisc.arc(x, py, 4, 0, 2 * Math.PI);
+                    ctxDisc.fill();
+                });
+            });
+            
+            // Draw sample period indicators
+            ctxDisc.strokeStyle = '#9e9e9e';
+            ctxDisc.lineWidth = 1;
+            ctxDisc.setLineDash([5, 5]);
+            for (let i = 0; i <= config.numTaps; i++) {
+                const x = margin.left + i * (plotW / config.numTaps);
+                ctxDisc.beginPath();
+                ctxDisc.moveTo(x, margin.top);
+                ctxDisc.lineTo(x, margin.top + plotH);
+                ctxDisc.stroke();
+            }
+            ctxDisc.setLineDash([]);
+            
+            // Labels
+            ctxDisc.fillStyle = '#333';
+            ctxDisc.font = 'bold 14px Arial';
+            ctxDisc.textAlign = 'center';
+            ctxDisc.fillText('Tap Index (k)', margin.left + plotW / 2, h - 20);
+            
+            ctxDisc.save();
+            ctxDisc.translate(20, margin.top + plotH / 2);
+            ctxDisc.rotate(-Math.PI / 2);
+            ctxDisc.fillText(config.logScale ? 'Power (dB)' : 'Power (normalized)', 0, 0);
+            ctxDisc.restore();
+            
+            // X-axis ticks
+            ctxDisc.font = '12px Arial';
+            ctxDisc.textAlign = 'center';
+            for (let i = 0; i < config.numTaps; i++) {
+                const x = margin.left + (i + 0.5) * (plotW / config.numTaps);
+                ctxDisc.fillText(i.toString(), x, h - 35);
+            }
+            
+            // Y-axis ticks
+            ctxDisc.textAlign = 'right';
+            for (let i = 0; i <= 5; i++) {
+                const y = margin.top + plotH - (plotH * i / 5);
+                let label;
+                if (config.logScale) {
+                    label = -60 + (60 * i / 5);
+                    ctxDisc.fillText(label.toFixed(0), margin.left - 10, y + 4);
+                } else {
+                    label = i / 5;
+                    ctxDisc.fillText(label.toFixed(1), margin.left - 10, y + 4);
+                }
+            }
+            
+            // Sample period annotation
+            ctxDisc.fillStyle = '#666';
+            ctxDisc.font = '11px Arial';
+            ctxDisc.textAlign = 'center';
+            ctxDisc.fillText(`T_s = ${samplePeriod.toFixed(1)} ns`, margin.left + plotW / 2, margin.top - 15);
+        }
+        
+        function draw() {
+            drawContinuous();
+            drawDiscrete();
+        }
+        
+        // Event listeners
+        document.getElementById('rmsDelay').addEventListener('input', (e) => {
+            config.rmsDelay = parseInt(e.target.value);
+            document.getElementById('rmsValue').textContent = config.rmsDelay + ' ns';
+            generatePaths();
+            draw();
+        });
+        
+        document.getElementById('maxDelay').addEventListener('input', (e) => {
+            config.maxDelay = parseInt(e.target.value);
+            document.getElementById('maxDelayValue').textContent = config.maxDelay + ' ns';
+            draw();
+        });
+        
+        document.getElementById('numPaths').addEventListener('input', (e) => {
+            config.numPaths = parseInt(e.target.value);
+            document.getElementById('numPathsValue').textContent = config.numPaths;
+            generatePaths();
+            draw();
+        });
+        
+        document.getElementById('sampleRate').addEventListener('input', (e) => {
+            config.sampleRate = parseInt(e.target.value);
+            document.getElementById('sampleRateValue').textContent = config.sampleRate + ' MHz';
+            draw();
+        });
+        
+        document.getElementById('numTaps').addEventListener('input', (e) => {
+            config.numTaps = parseInt(e.target.value);
+            document.getElementById('numTapsValue').textContent = config.numTaps;
+            draw();
+        });
+        
+        document.getElementById('regenerate').addEventListener('click', () => {
+            generatePaths();
+            draw();
+        });
+        
+        document.getElementById('showEnvelope').addEventListener('change', (e) => {
+            config.showEnvelope = e.target.checked;
+            draw();
+        });
+        
+        document.getElementById('showPaths').addEventListener('change', (e) => {
+            config.showPaths = e.target.checked;
+            draw();
+        });
+        
+        document.getElementById('showGrid').addEventListener('change', (e) => {
+            config.showGrid = e.target.checked;
+            draw();
+        });
+        
+        document.getElementById('logScale').addEventListener('change', (e) => {
+            config.logScale = e.target.checked;
+            draw();
+        });
+        
+        // Initialize
+        generatePaths();
+        draw();
+    </script>
+</body>
+</html>
