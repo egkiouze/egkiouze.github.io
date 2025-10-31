@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Range Visualizer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+		.home-link {
+            position: sticky;
+            top: 20px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #2d3748;
+            font-weight: 600;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            border: 1px solid #e2e8f0;
+            display: inline-block;
+            align-items: center;
+            gap: 8px;
+        }
+        .home-link:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            background: #f7fafc;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .control-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .control-section {
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .control-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #cbd5e0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: #764ba2;
+            transform: scale(1.2);
+        }
+
+        .value-display {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .chart-wrapper {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e2e8f0;
+        }
+
+        .chart-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        canvas {
+            max-height: 400px;
+        }
+
+        .info-panel {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .info-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .info-label {
+            font-size: 0.85em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 1.5em;
+            font-weight: 700;
+        }
+
+        .description, footer {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e2e8f0;
+            line-height: 1.8;
+            color: #2d3748;
+        }
+
+        .description h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .description p {
+            margin-bottom: 15px;
+        }
+
+        .description strong {
+            color: #764ba2;
+        }
+
+        .tier-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .tier-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tier-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid #333;
+        }
+
+        @media (max-width: 968px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+		}
+		footer {
+			background: white;
+            padding: 10px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e2e8f0;
+            line-height: 1.8;
+            color: #2d3748;
+			text-align: center;
+            font-size: 1em;
+        }
+		.copyleft {
+			display:inline-block;
+			transform: rotate(180deg);
+		}
+    </style>
+</head>
+<body>
+    <div class="container">
+		<a href="index.html#phd" class="home-link">
+            <span>🏠</span>
+            <span>Home</span>
+        </a>
+        <h1>📡 Dynamic Range Signal Propagation</h1>
+        <p class="subtitle">Multi-RU Wideband Uplink System Visualization</p>
+
+        <div class="controls">
+            <div class="control-section">
+                <div class="section-title">Tier Distances</div>
+                <div class="control-group">
+                    <div class="control-item">
+                        <label>1st Tier Distance (m): <span class="value-display" id="tier1DistValue">50</span></label>
+                        <input type="range" id="tier1Dist" min="20" max="150" value="50" step="5">
+                    </div>
+                    <div class="control-item">
+                        <label>2nd Tier Distance (m): <span class="value-display" id="tier2DistValue">100</span></label>
+                        <input type="range" id="tier2Dist" min="50" max="250" value="100" step="5">
+                    </div>
+                    <div class="control-item">
+                        <label>3rd Tier Distance (m): <span class="value-display" id="tier3DistValue">150</span></label>
+                        <input type="range" id="tier3Dist" min="100" max="500" value="150" step="10">
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <div class="section-title">Target SNR per Tier</div>
+                <div class="control-group">
+                    <div class="control-item">
+                        <label>1st Tier SNR (dB): <span class="value-display" id="tier1SNRValue">20</span></label>
+                        <input type="range" id="tier1SNR" min="10" max="40" value="20" step="1">
+                    </div>
+                    <div class="control-item">
+                        <label>2nd Tier SNR (dB): <span class="value-display" id="tier2SNRValue">10</span></label>
+                        <input type="range" id="tier2SNR" min="5" max="30" value="10" step="1">
+                    </div>
+                    <div class="control-item">
+                        <label>3rd Tier SNR (dB): <span class="value-display" id="tier3SNRValue">0</span></label>
+                        <input type="range" id="tier3SNR" min="0" max="20" value="0" step="1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <div class="section-title">System Parameters</div>
+                <div class="control-group">
+                    <div class="control-item">
+                        <label>Bandwidth (MHz): <span class="value-display" id="bwValue">20</span></label>
+                        <input type="range" id="bandwidth" min="5" max="100" value="20" step="5">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-container">
+            <div class="chart-wrapper">
+                <div class="chart-title">SNR vs Distance from Transmitter</div>
+                <canvas id="snrChart"></canvas>
+                <div class="tier-legend">
+                    <div class="tier-item">
+                        <div class="tier-color" style="background: #22c55e;"></div>
+                        <span>1st Tier</span>
+                    </div>
+                    <div class="tier-item">
+                        <div class="tier-color" style="background: #eab308;"></div>
+                        <span>2nd Tier</span>
+                    </div>
+                    <div class="tier-item">
+                        <div class="tier-color" style="background: #ef4444;"></div>
+                        <span>3rd Tier</span>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <div class="chart-title">SNR Contour Map (3 Tiers)</div>
+                <canvas id="contourChart"></canvas>
+            </div>
+        </div>
+
+        <div class="info-panel">
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Path Loss Exponent (α)</div>
+                    <div class="info-value" id="exponentOut">--</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Reference Distance d₀ (m)</div>
+                    <div class="info-value" id="d0Out">--</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Transmit Power (dBm)</div>
+                    <div class="info-value" id="txPowerOut">--</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">SNR at 100m</div>
+                    <div class="info-value" id="snr100m">--</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="description">
+            <h2>About Dynamic Range in Wireless Systems</h2>
+            <p>
+                This visualization demonstrates the <strong>dynamic range</strong> of signal propagation in a multi-RU (Radio Unit) wireless uplink system. 
+                The dynamic range refers to the variation in received signal strength across different distances from the transmitter, which is a critical 
+                consideration in cell-free and distributed antenna systems.
+            </p>
+            <p>
+                <strong>Large-Scale Fading Coefficient (LSFC):</strong> The path loss model uses LSFC = 1/(1+(d/d₀)^α), where d is the distance, 
+                d₀ is the reference distance, and α is the path loss exponent. This model captures how signal power decreases with distance due to 
+                propagation effects.
+            </p>
+            <p>
+                <strong>Tiered Architecture:</strong> The system divides coverage into three tiers based on distance from the transmitter:
+            </p>
+            <ul style="margin-left: 20px; margin-bottom: 15px;">
+                <li><strong>1st Tier (Green):</strong> Closest RUs with highest SNR - these provide the strongest signal reception</li>
+                <li><strong>2nd Tier (Yellow):</strong> Middle-distance RUs with moderate SNR - secondary coverage layer</li>
+                <li><strong>3rd Tier (Red):</strong> Farthest RUs with lowest SNR - edge coverage extending to 0 dB threshold</li>
+            </ul>
+            <p>
+                <strong>Key Parameters:</strong> The noise floor is set at N₀ = -169 dBm/Hz (thermal noise), and the SNR is calculated as 
+                SNR = (P_tx × LSFC) / (N₀ × BW), where P_tx is transmit power and BW is bandwidth. Adjust the sliders to explore how 
+                tier distances and target SNR levels affect the required system parameters like path loss exponent and reference distance.
+            </p>
+            <p>
+                The <strong>contour map</strong> shows the spatial distribution of SNR around a centrally-located transmitter, revealing 
+                how signal quality varies across a 2D plane. The <strong>SNR vs Distance</strong> plot illustrates the signal degradation 
+                as a function of range, with tier boundaries marked to show the three-tier coverage architecture.
+            </p>
+        </div>
+		<footer>
+            <p><span class="copyleft">&copy;</span> 2025 Eleni Gkiouzepi. GNU General Public License with attribution and proper citation required.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Constants
+        const N0_DBM = -169; // Noise power spectral density in dBm/Hz
+
+        // Helper functions
+        function dbm2pow(dbm) {
+            return Math.pow(10, (dbm - 30) / 10);
+        }
+
+        function pow2db(pow) {
+            return 10 * Math.log10(pow);
+        }
+
+        function calculateLSFC(distance, d0, exponent) {
+            return 1 / (1 + Math.pow(distance / d0, exponent));
+        }
+
+        function calculateSNR(distance, d0, exponent, txPowerDbm, bandwidth) {
+            const txPower = dbm2pow(txPowerDbm);
+            const N0 = dbm2pow(N0_DBM);
+            const noisePower = N0 * bandwidth * 1e6;
+            
+            const lsfc = calculateLSFC(distance, d0, exponent);
+            const receivedPower = txPower * lsfc;
+            const snr = receivedPower / noisePower;
+            
+            return pow2db(snr);
+        }
+
+        // Solve for path loss exponent and reference distance given constraints
+        function solvePathLossParams(tier1Dist, tier1SNR, tier2Dist, tier2SNR, tier3Dist, tier3SNR, bandwidth) {
+            // We need to find d0, alpha, and txPower such that:
+            // SNR(tier1Dist) = tier1SNR
+            // SNR(tier2Dist) = tier2SNR
+            // SNR(tier3Dist) = tier3SNR
+            
+            let bestParams = null;
+            let minError = Infinity;
+            
+            for (let alpha = 2.0; alpha <= 5.0; alpha += 0.02) {
+                for (let d0 = 1; d0 <= 100; d0 += 0.5) {
+                    // Calculate LSFC for each tier
+                    const lsfc1 = calculateLSFC(tier1Dist, d0, alpha);
+                    const lsfc2 = calculateLSFC(tier2Dist, d0, alpha);
+                    const lsfc3 = calculateLSFC(tier3Dist, d0, alpha);
+                    
+                    // From SNR equations:
+                    // SNR_i = 10*log10(Ptx * LSFC_i / (N0*BW))
+                    // This gives: Ptx = (N0*BW) * 10^(SNR_i/10) / LSFC_i
+                    
+                    const N0 = dbm2pow(N0_DBM);
+                    const noisePower = N0 * bandwidth * 1e6;
+                    
+                    // Calculate required power for each tier
+                    const power1 = noisePower * Math.pow(10, tier1SNR / 10) / lsfc1;
+                    const power2 = noisePower * Math.pow(10, tier2SNR / 10) / lsfc2;
+                    const power3 = noisePower * Math.pow(10, tier3SNR / 10) / lsfc3;
+                    
+                    // Error: difference between required powers (they should all be the same)
+                    const avgPower = (power1 + power2 + power3) / 3;
+                    const error = Math.abs(power1 - avgPower) + Math.abs(power2 - avgPower) + Math.abs(power3 - avgPower);
+                    
+                    if (error < minError) {
+                        minError = error;
+                        const txPowerDbm = pow2db(avgPower) + 30;
+                        
+                        bestParams = {
+                            alpha: alpha,
+                            d0: d0,
+                            txPowerDbm: txPowerDbm,
+                            error: error
+                        };
+                    }
+                }
+            }
+            
+            return bestParams;
+        }
+
+        // Chart instances
+        let snrChart, contourChart;
+
+        // Initialize charts
+        function initCharts() {
+            const snrCtx = document.getElementById('snrChart').getContext('2d');
+            snrChart = new Chart(snrCtx, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: 'SNR (dB)',
+                            data: [],
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'LSFC',
+                            data: [],
+                            borderColor: '#f56565',
+                            backgroundColor: 'rgba(245, 101, 101, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            yAxisID: 'y1'
+                        },
+                        {
+                            label: '1st Tier Constraint',
+                            data: [],
+                            borderColor: '#22c55e',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            yAxisID: 'y',
+                            showLine: true
+                        },
+                        {
+                            label: '2nd Tier Constraint',
+                            data: [],
+                            borderColor: '#eab308',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            yAxisID: 'y',
+                            showLine: true
+                        },
+                        {
+                            label: '3rd Tier Constraint',
+                            data: [],
+                            borderColor: '#ef4444',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            yAxisID: 'y',
+                            showLine: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            title: {
+                                display: true,
+                                text: 'Distance (m)',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'SNR (dB)',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        },
+                        y1: {
+                            type: 'logarithmic',
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'LSFC',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            grid: { display: false },
+                            min: 0.0001,
+                            max: 1
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y.toFixed(2);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const contourCtx = document.getElementById('contourChart').getContext('2d');
+            contourChart = new Chart(contourCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: []
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 1,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            title: {
+                                display: true,
+                                text: 'X Position (m)',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            grid: { color: 'rgba(0, 0, 0, 0.1)' }
+                        },
+                        y: {
+                            type: 'linear',
+                            title: {
+                                display: true,
+                                text: 'Y Position (m)',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            grid: { color: 'rgba(0, 0, 0, 0.1)' }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `SNR: ${context.dataset.label}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update charts
+        function updateCharts() {
+            const tier1SNR = parseFloat(document.getElementById('tier1SNR').value);
+            const tier2SNR = parseFloat(document.getElementById('tier2SNR').value);
+            const tier3SNR = parseFloat(document.getElementById('tier3SNR').value);
+            const tier1Dist = parseFloat(document.getElementById('tier1Dist').value);
+            const tier2Dist = parseFloat(document.getElementById('tier2Dist').value);
+            const tier3Dist = parseFloat(document.getElementById('tier3Dist').value);
+            const bandwidth = parseFloat(document.getElementById('bandwidth').value);
+
+            // Solve for path loss parameters
+            const params = solvePathLossParams(tier1Dist, tier1SNR, tier2Dist, tier2SNR, tier3Dist, tier3SNR, bandwidth);
+            
+            if (!params) return;
+
+            const { alpha, d0, txPowerDbm } = params;
+
+            // Update SNR vs Distance chart
+            const distances = [];
+            const snrValues = [];
+            const lsfcValues = [];
+            
+            const maxDist = Math.max(tier3Dist * 1.2, 300);
+            for (let d = 1; d <= maxDist; d += 1) {
+                distances.push(d);
+                snrValues.push(calculateSNR(d, d0, alpha, txPowerDbm, bandwidth));
+                lsfcValues.push(calculateLSFC(d, d0, alpha));
+            }
+
+            snrChart.data.datasets[0].data = distances.map((d, i) => ({x: d, y: snrValues[i]}));
+            snrChart.data.datasets[1].data = distances.map((d, i) => ({x: d, y: lsfcValues[i]}));
+            
+            // Add tier constraint lines (horizontal at target SNR, vertical at distance)
+            snrChart.data.datasets[2].data = [
+                {x: 0, y: tier1SNR},
+                {x: tier1Dist, y: tier1SNR},
+                {x: tier1Dist, y: -50}
+            ];
+            snrChart.data.datasets[3].data = [
+                {x: 0, y: tier2SNR},
+                {x: tier2Dist, y: tier2SNR},
+                {x: tier2Dist, y: -50}
+            ];
+            snrChart.data.datasets[4].data = [
+                {x: 0, y: tier3SNR},
+                {x: tier3Dist, y: tier3SNR},
+                {x: tier3Dist, y: -50}
+            ];
+            
+            snrChart.update();
+
+            // Update contour chart with concentric circles at 5dB intervals
+            const maxSNRAtCenter = calculateSNR(d0, d0, alpha, txPowerDbm, bandwidth);
+            const snrIntervals = [];
+            
+            // Generate SNR contour levels at 5 dB intervals
+            for (let snr = Math.floor(maxSNRAtCenter / 5) * 5; snr >= Math.min(tier3SNR - 5, -10); snr -= 5) {
+                snrIntervals.push(snr);
+            }
+
+            const datasets = [];
+            const colors = ['#dc2626', '#ea580c', '#ca8a04', '#16a34a', '#0891b2', '#4f46e5', '#7c3aed'];
+            
+            // For each SNR level, find the distance where SNR equals that value
+            snrIntervals.forEach((targetSNR, idx) => {
+                // Binary search to find distance for this SNR
+                let distForSNR = 0;
+                for (let d = 1; d <= tier3Dist * 1.5; d += 0.5) {
+                    const snr = calculateSNR(d, d0, alpha, txPowerDbm, bandwidth);
+                    if (Math.abs(snr - targetSNR) < 0.5) {
+                        distForSNR = d;
+                        break;
+                    }
+                }
+                
+                if (distForSNR > 0 && distForSNR <= tier3Dist * 1.2) {
+                    // Generate circle points
+                    const circlePoints = [];
+                    const numPoints = 100;
+                    for (let i = 0; i <= numPoints; i++) {
+                        const angle = (i / numPoints) * 2 * Math.PI;
+                        const x = distForSNR * Math.cos(angle);
+                        const y = distForSNR * Math.sin(angle);
+                        circlePoints.push({x, y});
+                    }
+                    
+                    datasets.push({
+                        label: `${targetSNR} dB`,
+                        data: circlePoints,
+                        showLine: true,
+                        borderColor: colors[idx % colors.length],
+                        backgroundColor: 'transparent',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        fill: false
+                    });
+                }
+            });
+
+            // Add tier boundary circles
+            const tierColors = ['#22c55e', '#eab308', '#ef4444'];
+            const tierDistances = [tier1Dist, tier2Dist, tier3Dist];
+            const tierLabels = ['1st Tier Boundary', '2nd Tier Boundary', '3rd Tier Boundary'];
+            
+            tierDistances.forEach((dist, idx) => {
+                const circlePoints = [];
+                const numPoints = 100;
+                for (let i = 0; i <= numPoints; i++) {
+                    const angle = (i / numPoints) * 2 * Math.PI;
+                    const x = dist * Math.cos(angle);
+                    const y = dist * Math.sin(angle);
+                    circlePoints.push({x, y});
+                }
+                
+                datasets.push({
+                    label: tierLabels[idx],
+                    data: circlePoints,
+                    showLine: true,
+                    borderColor: tierColors[idx],
+                    backgroundColor: 'transparent',
+                    borderWidth: 3,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    fill: false
+                });
+            });
+
+            // Add transmitter at center
+            datasets.push({
+                label: 'Transmitter',
+                data: [{x: 0, y: 0}],
+                showLine: false,
+                backgroundColor: 'rgba(0, 0, 0, 1)',
+                borderColor: 'white',
+                borderWidth: 2,
+                pointRadius: 8,
+                pointStyle: 'circle'
+            });
+
+            contourChart.data.datasets = datasets;
+            contourChart.update();
+
+            // Update info panel
+            const snr100m = calculateSNR(100, d0, alpha, txPowerDbm, bandwidth);
+
+            document.getElementById('exponentOut').textContent = alpha.toFixed(2);
+            document.getElementById('d0Out').textContent = d0.toFixed(2);
+            document.getElementById('txPowerOut').textContent = txPowerDbm.toFixed(1);
+            document.getElementById('snr100m').textContent = `${snr100m.toFixed(1)} dB`;
+        }
+
+        // Event listeners
+        document.getElementById('tier1SNR').addEventListener('input', (e) => {
+            document.getElementById('tier1SNRValue').textContent = e.target.value;
+            updateCharts();
+        });
+
+        document.getElementById('tier2SNR').addEventListener('input', (e) => {
+            document.getElementById('tier2SNRValue').textContent = e.target.value;
+            updateCharts();
+        });
+
+        document.getElementById('tier3SNR').addEventListener('input', (e) => {
+            document.getElementById('tier3SNRValue').textContent = e.target.value;
+            updateCharts();
+        });
+
+        document.getElementById('tier1Dist').addEventListener('input', (e) => {
+            document.getElementById('tier1DistValue').textContent = e.target.value;
+            updateCharts();
+        });
+
+        document.getElementById('tier2Dist').addEventListener('input', (e) => {
+            document.getElementById('tier2DistValue').textContent = e.target.value;
+            updateCharts();
+        });
+
+        document.getElementById('tier3Dist').addEventListener('input', (e) => {
+            document.getElementById('tier3DistValue').textContent = e.target.value;
+            updateCharts();
+        });
+
+        document.getElementById('bandwidth').addEventListener('input', (e) => {
+            document.getElementById('bwValue').textContent = e.target.value;
+            updateCharts();
+        });
+
+        // Initialize
+        initCharts();
+        updateCharts();
+    </script>
+</body>
+</html>
