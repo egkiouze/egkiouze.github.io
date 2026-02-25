@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Experience – Eleni Gkiouzepi</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; line-height:1.6; color:#333; background:linear-gradient(160deg,#d6e4f7 0%,#eaf0fb 40%,#c9d8ee 100%); background-attachment:fixed; min-height:100vh; }
+        nav { background:#003380; position:sticky; top:0; z-index:1000; box-shadow:0 4px 20px rgba(0,51,128,0.35); }
+        .menu-toggle { display:none; background:none; border:none; color:white; font-size:1.4em; padding:14px 20px; cursor:pointer; width:100%; text-align:left; }
+        nav ul { list-style:none; display:flex; justify-content:center; flex-wrap:wrap; }
+        nav a { display:block; color:white; text-decoration:none; padding:14px 20px; font-size:0.88em; letter-spacing:0.4px; transition:background 0.25s; }
+        nav a:hover, nav a.active { background:rgba(255,255,255,0.18); }
+        header { background:linear-gradient(135deg,#003380 0%,#0052cc 100%); color:white; padding:40px 40px 32px; text-align:center; }
+        header h1 { font-size:2.2em; font-weight:300; letter-spacing:2px; margin-bottom:6px; }
+        header p { font-size:1em; opacity:0.85; }
+        .page-body { padding:48px 24px; max-width:1060px; margin:0 auto; }
+        section { background:#fff; border-radius:14px; padding:36px 40px; margin-bottom:36px;
+            box-shadow:0 2px 4px rgba(0,51,128,0.04),0 6px 14px rgba(0,51,128,0.08),0 20px 40px rgba(0,51,128,0.12),0 40px 80px rgba(0,51,128,0.06);
+            opacity:0; transform:translateY(36px);
+            transition:opacity 0.65s cubic-bezier(0.22,1,0.36,1),transform 0.65s cubic-bezier(0.22,1,0.36,1),box-shadow 0.3s ease; }
+        section.visible { opacity:1; transform:translateY(0); }
+        section:hover { box-shadow:0 2px 4px rgba(0,51,128,0.06),0 8px 20px rgba(0,51,128,0.13),0 28px 55px rgba(0,51,128,0.17),0 50px 90px rgba(0,51,128,0.08); }
+        h2 { color:#003380; font-size:1.72em; font-variant:small-caps; padding-bottom:10px; border-bottom:3px solid #0052cc; letter-spacing:1px; margin-bottom:28px; }
+        h3 { color:#0052cc; font-size:1.18em; margin-bottom:4px; }
+        .back-link { display:inline-block; margin-bottom:24px; font-size:0.9em; color:#0052cc; text-decoration:none; border-bottom:1px dotted #0052cc; }
+        .back-link:hover { border-bottom-style:solid; }
+        a { color:#0052cc; }
+        footer { background:#003380; color:white; text-align:center; padding:20px; font-size:0.9em; }
+
+        .exp-item {
+            padding:24px 24px 20px; margin-bottom:20px;
+            background:#f4f7fc; border-radius:10px;
+            border-left:4px solid #0052cc;
+            transition:transform 0.2s, box-shadow 0.2s;
+        }
+        .exp-item:hover { transform:translateX(5px); box-shadow:0 6px 18px rgba(0,82,204,0.18); }
+        .exp-header { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; margin-bottom:6px; }
+        .exp-date { color:#666; font-weight:700; font-size:0.9em; white-space:nowrap; margin-left:16px; }
+        .exp-location { color:#0052cc; font-style:italic; font-size:0.92em; margin-bottom:10px; }
+        .exp-desc { color:#555; line-height:1.7; font-size:0.95em; }
+        .exp-label { font-size:0.75em; text-transform:uppercase; letter-spacing:1px; color:#0052cc; font-weight:700; margin-bottom:4px; }
+
+        @media(max-width:580px){
+            header h1{font-size:1.75em;} .page-body{padding:20px 12px;} section{padding:22px 16px;}
+            .menu-toggle{display:block;} nav ul{flex-direction:column;max-height:0;overflow:hidden;transition:max-height 0.3s ease-out;}
+            nav ul.show{max-height:500px;transition:max-height 0.5s ease-in;}
+            nav a{padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.1);}
+            .exp-header{flex-direction:column;} .exp-date{margin-left:0;margin-top:4px;}
+        }
+    </style>
+</head>
+<body>
+<nav>
+    <button class="menu-toggle" onclick="document.getElementById('nm').classList.toggle('show')">☰ Menu</button>
+    <ul id="nm">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="research.html" class="active">Research</a></li>
+        <li><a href="education.html">Education</a></li>
+        <li><a href="publications.html">Publications</a></li>
+        <li><a href="index.html#skills">Skills</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+    </ul>
+</nav>
+<header>
+    <h1>Eleni Gkiouzepi</h1>
+    <p>Research Experience</p>
+</header>
+<div class="page-body">
+    <a class="back-link" href="index.html">← Back to main page</a>
+    <section>
+        <h2>Research Experience</h2>
+
+        <div class="exp-item">
+            <div class="exp-label">Current · PhD Student</div>
+            <div class="exp-header">
+                <h3>TU Berlin — Communications and Information Theory Chair</h3>
+                <span class="exp-date">2022 – Present</span>
+            </div>
+            <div class="exp-location">Faculty of Electrical Engineering and Computer Science, Berlin, Germany</div>
+            <div class="exp-desc">
+                <strong>User-Centric Wireless Networks:</strong> Investigation of Random Access in super-dense cell-free user-centric networks. Research focuses on joint message detection, channel estimation, and user position estimation using message passing algorithms and probabilistic inference methods in large-scale antenna systems.
+            </div>
+        </div>
+
+        <div class="exp-item">
+            <div class="exp-label">Research Engineer</div>
+            <div class="exp-header">
+                <h3>CNRS / Université Grenoble Alpes — LIG Laboratory</h3>
+                <span class="exp-date">2019 – 2021</span>
+            </div>
+            <div class="exp-location">Grenoble, France</div>
+            <div class="exp-desc">
+                <strong>Collaborative ad transparency:</strong> Development and evaluation of a crowdsourced method to infer why users receive their ads in social media platforms. The work addressed privacy implications of targeted advertising and proposed methods for transparency at scale, combining statistical analysis with user studies.
+            </div>
+        </div>
+
+        <div class="exp-item">
+            <div class="exp-label">Research</div>
+            <div class="exp-header">
+                <h3>Athens University of Economics and Business (AUEB)</h3>
+                <span class="exp-date">2018 – 2019</span>
+            </div>
+            <div class="exp-location">Department of Statistics, Athens, Greece</div>
+            <div class="exp-desc">
+                <strong>Algebraic Statistics:</strong> Discovery of causal effects (causal relationships) in mixed graphs parametrized with structural equation models. Applied algebraic and statistical techniques to identify identifiable causal parameters in graphical models with both directed and bidirected edges.
+            </div>
+        </div>
+    </section>
+</div>
+<footer><p>&copy; 2025 Eleni Gkiouzepi. All rights reserved.</p></footer>
+<script>
+    const obs = new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('visible');obs.unobserve(x.target);}}),{threshold:0.07});
+    document.querySelectorAll('section').forEach(s=>obs.observe(s));
+</script>
+</body>
+</html>
