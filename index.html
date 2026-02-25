@@ -1,787 +1,757 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eleni Gkiouzepi - Academic CV</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eleni Gkiouzepi - Academic CV</title>
+  <meta name="description" content="Eleni Gkiouzepi — PhD Student in Telecommunications, ML Researcher. Academic CV with research, publications, and demos." />
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+  <style>
+    :root{
+      --bg1:#d6e4f7;
+      --bg2:#eaf0fb;
+      --bg3:#c9d8ee;
+      --nav:#003380;
+      --nav2:#0052cc;
+      --ink:#333;
+      --muted:#666;
 
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: white;
-            box-shadow: 0 10px 40px rgba(0, 51, 128, 0.1);
-            border-radius: 8px;
-            overflow: hidden;
-        }
+      --shadow1: 0  2px  4px  rgba(0,51,128,0.04);
+      --shadow2: 0  6px  14px rgba(0,51,128,0.08);
+      --shadow3: 0 20px 40px  rgba(0,51,128,0.12);
+      --shadow4: 0 40px 80px  rgba(0,51,128,0.06);
+    }
 
-        header {
-            background: linear-gradient(135deg, #003380 0%, #0052cc 100%);
-            color: white;
-            padding: 40px;
-            text-align: center;
-        }
+    *{margin:0;padding:0;box-sizing:border-box;}
 
-        header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            font-weight: 300;
-            letter-spacing: 2px;
-        }
+    body{
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Tahoma, Geneva, Verdana, sans-serif;
+      line-height:1.6;
+      color:var(--ink);
+      background: linear-gradient(160deg, var(--bg1) 0%, var(--bg2) 40%, var(--bg3) 100%);
+      background-attachment: fixed;
+      min-height:100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
 
-        header p {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
+    /* ===== Background Word Cloud (behind everything) ===== */
+    #bgWordCloud{
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+      filter: saturate(0.98) contrast(1.02); /* a tad stronger => more visible */
+    }
 
-        nav {
-            background: #0052cc;
-            padding: 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
+    .word-cloud-item{
+      position:absolute;
+      white-space:nowrap;
+      will-change: transform;
+      user-select: none;
 
-        .nav-container {
-            position: relative;
-        }
+      /* MORE visible (higher opacity) */
+      opacity: 0.62;
 
-        .menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5em;
-            padding: 15px 20px;
-            cursor: pointer;
-            width: 100%;
-            text-align: left;
-        }
+      /* readability against light background */
+      text-shadow: 0 1px 1px rgba(255,255,255,0.25);
+    }
 
-        .menu-toggle:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
+    @keyframes orbit{
+      from{ transform:rotate(0deg) translateX(var(--r)) rotate(0deg); }
+      to  { transform:rotate(360deg) translateX(var(--r)) rotate(-360deg); }
+    }
+    @keyframes orbit-reverse{
+      from{ transform:rotate(0deg) translateX(var(--r)) rotate(0deg); }
+      to  { transform:rotate(-360deg) translateX(var(--r)) rotate(360deg); }
+    }
 
-        .menu-icon {
-            display: inline-block;
-            margin-right: 10px;
-        }
+    /* Slightly stronger color alphas (plus the higher overall opacity) */
+    .wc1{ font-size:0.80em; color:rgba(0,51,128,0.26); }
+    .wc2{ font-size:0.95em; color:rgba(0,51,128,0.34); }
+    .wc3{ font-size:1.15em; color:rgba(0,51,128,0.42); }
+    .wc4{ font-size:1.45em; color:rgba(0,82,204,0.50); }
+    .wc5{ font-size:1.80em; font-weight:700; color:rgba(0,51,128,0.60); }
 
-        nav ul {
-            list-style: none;
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin: 0;
-            padding: 0;
-        }
+    /* ===== Foreground stacking ===== */
+    nav, header, main, footer{
+      position: relative;
+      z-index: 2;
+    }
 
-        nav li {
-            margin: 0;
-        }
+    /* NAV */
+    nav{
+      background: var(--nav);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      box-shadow: 0 4px 20px rgba(0,51,128,0.35);
+    }
+    .menu-toggle{
+      display:none;
+      background:none;
+      border:none;
+      color:#fff;
+      font-size:1.1rem;
+      padding:14px 20px;
+      cursor:pointer;
+      width:100%;
+      text-align:left;
+    }
+    .menu-toggle:hover{ background: rgba(255,255,255,0.1); }
+    nav ul{
+      list-style:none;
+      display:flex;
+      justify-content:center;
+      flex-wrap:wrap;
+    }
+    nav a{
+      display:block;
+      color:#fff;
+      text-decoration:none;
+      padding:14px 20px;
+      font-size:0.88em;
+      letter-spacing:0.4px;
+      transition: background 0.25s;
+    }
+    nav a:hover{ background: rgba(255,255,255,0.18); }
 
-        nav a {
-            display: block;
-            color: white;
-            text-decoration: none;
-            padding: 15px 25px;
-            transition: background 0.3s ease;
-            font-size: 0.95em;
-            /*text-transform: uppercase;*/
-            letter-spacing: 1px;
-        }
+    /* HEADER */
+    header{
+      background: linear-gradient(135deg, var(--nav) 0%, var(--nav2) 100%);
+      color:#fff;
+      padding:56px 40px 48px;
+      text-align:center;
+    }
+    header h1{ font-size:2.5em; font-weight:300; letter-spacing:2px; margin-bottom:10px; }
+    header p{ font-size:1.1em; opacity:0.88; }
 
-        nav a:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
+    /* PAGE */
+    main.page-body{
+      padding: 28px 12px;
+      max-width: 1060px;
+      margin: 0 auto;
+    }
 
-        .content {
-            padding: 40px;
-        }
+    /* Floating sections (MORE GAPS) */
+    section{
+      border-radius:14px;
+      padding: 26px 28px;
 
-        section {
-            margin-bottom: 50px;
-            animation: fadeIn 0.6s ease-in;
-        }
+      /* reveal more background */
+      margin-bottom: 78px;
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+      box-shadow: var(--shadow1), var(--shadow2), var(--shadow3), var(--shadow4);
 
-        h2 {
-            color: #003380;
-            font-size: 1.8em;
-			font-variant: small-caps;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #0052cc;
-            /*text-transform: capitalize;*/
-            letter-spacing: 1px;
-        }
+      opacity:0;
+      transform: translateY(36px);
+      transition:
+        opacity 0.65s cubic-bezier(0.22,1,0.36,1),
+        transform 0.65s cubic-bezier(0.22,1,0.36,1),
+        box-shadow 0.3s ease,
+        background 0.3s ease,
+        border-color 0.3s ease;
 
-        h3 {
-            color: #0052cc;
-            font-size: 1.3em;
-            margin-bottom: 5px;
-        }
+      scroll-margin-top: 84px;
+      content-visibility: auto;
+      contain-intrinsic-size: 300px;
 
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
+      /* initial state can be slightly milky; visible state will be almost transparent */
+      background: rgba(255,255,255,0.30);
+      border: 1px solid rgba(255,255,255,0.25);
 
-        .info-item {
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 5px;
-            border-left: 4px solid #0052cc;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
 
-        .info-item:hover {
-            transform: translateX(5px);
-            box-shadow: 0 4px 12px rgba(0, 82, 204, 0.15);
-        }
+    /* Requested: visible sections background transparent */
+    section.visible{
+      opacity:1;
+      transform:translateY(0);
 
-        .info-item strong {
-            color: #003380;
-            display: block;
-            margin-bottom: 5px;
-        }
+      /* near-zero alpha so it reads as transparent but keeps backdrop-filter working */
+      background: rgba(255,255,255,0.02);
+      border-color: rgba(255,255,255,0.18);
+    }
 
-        .experience-item {
-            margin-bottom: 30px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
+    section:hover{
+      /* still very transparent on hover */
+      background: rgba(255,255,255,0.05);
+      box-shadow:
+        0  2px  4px  rgba(0,51,128,0.06),
+        0  8px  20px rgba(0,51,128,0.13),
+        0 28px 55px  rgba(0,51,128,0.17),
+        0 50px 90px  rgba(0,51,128,0.08);
+    }
 
-        .experience-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 82, 204, 0.15);
-        }
+    section:last-of-type{ margin-bottom: 40px; }
 
-        .experience-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-        }
+    /* Headings */
+    h2{
+      color: var(--nav);
+      font-size:1.72em;
+      font-variant:small-caps;
+      padding-bottom:10px;
+      border-bottom:3px solid rgba(0,82,204,0.85);
+      letter-spacing:1px;
 
-        .experience-title {
-            flex: 1;
-            min-width: 200px;
-        }
+      /* Requested: h2 background transparent */
+      background: transparent;
+    }
 
-        .experience-date {
-            color: #666;
-            font-weight: bold;
-            white-space: nowrap;
-            margin-left: 20px;
-        }
+    .section-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      margin-bottom:22px;
+      gap: 12px;
+    }
 
-        .experience-location {
-            color: #0052cc;
-            font-style: italic;
-            margin-bottom: 10px;
-        }
+    .see-all{
+      font-size:0.87em;
+      color: var(--nav2);
+      text-decoration:none;
+      border-bottom:1px dotted var(--nav2);
+      white-space:nowrap;
+      margin-left:12px;
+      flex: 0 0 auto;
+    }
+    .see-all:hover{ border-bottom-style:solid; }
 
-        .experience-description {
-            color: #555;
-            line-height: 1.7;
-        }
+    .summary-box{
+      background: rgba(244,247,252,0.42);
+      padding: 18px 20px;
+      border-radius:8px;
+      border-left:4px solid rgba(0,82,204,0.85);
+      line-height:1.85;
+      margin-top:18px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
 
-        .publications ol {
-            counter-reset: publication;
-            list-style: none;
-        }
+    /* Cards */
+    .card-grid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:16px;
+    }
 
-        .publications ul {
-            list-style: none;
-        }
-		
-		.publications ul li {
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 5px;
-            position: relative;
-            padding-left: 50px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
+    .card{
+      background: rgba(244,247,252,0.48);
+      border-radius:10px;
+      padding:16px 16px 14px;
+      font-size:0.82em;
+      display:flex;
+      flex-direction:column;
+      gap:5px;
+      border-top:3px solid rgba(0,82,204,0.85);
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
 
-        .publications ol li {
-            counter-increment: publication;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 5px;
-            position: relative;
-            padding-left: 50px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
+    .card:hover{
+      transform:translateY(-4px);
+      box-shadow:0 8px 22px rgba(0,82,204,0.18);
+      background: rgba(244,247,252,0.56);
+    }
 
-        .publications ul li::before {
-            position: absolute;
-            left: 15px;
-            top: 15px;
-            background: #0052cc;
-            color: white;
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 0.9em;
-        }
+    .card-label{
+      font-size:0.72em;
+      text-transform:uppercase;
+      letter-spacing:1px;
+      color: var(--nav2);
+      font-weight:700;
+    }
+    .card-title{ font-weight:700; color: var(--nav); font-size:1.04em; line-height:1.3; }
+    .card-sub{ color:#555; font-style:italic; }
+    .card-desc{ color:#555; line-height:1.5; flex-grow:1; }
+    .card-date{ font-size:0.82em; color:#777; font-weight:600; }
+    .card-link{
+      margin-top:8px;
+      display:inline-block;
+      font-size:0.87em;
+      color: var(--nav2);
+      text-decoration:none;
+      border-bottom:1px dotted var(--nav2);
+    }
+    .card-link:hover{ border-bottom-style:solid; }
 
-        .publications li:hover {
-            transform: translateX(5px);
-            box-shadow: 0 4px 12px rgba(0, 82, 204, 0.15);
-        }
+    /* Clickable card links (for demos) */
+    .card.card--link{
+      text-decoration:none;
+      color:inherit;
+      display:flex;
+    }
+    .card.card--link:focus-visible{
+      outline:3px solid rgba(0,82,204,0.55);
+      outline-offset:3px;
+      border-radius:10px;
+    }
 
-        .publications ol li::before {
-            content: counter(publication);
-            position: absolute;
-            left: 15px;
-            top: 15px;
-            background: #0052cc;
-            color: white;
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 0.9em;
-        }
+    /* Skills */
+    .skills{
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap:13px;
+      margin-top:20px;
+    }
+    .skill-item{
+      padding:13px;
+      background: linear-gradient(135deg, var(--nav) 0%, var(--nav2) 100%);
+      color:#fff;
+      text-align:center;
+      border-radius:8px;
+      font-size:0.93em;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor:default;
+    }
+    .skill-item:hover{ transform:translateY(-5px); box-shadow:0 8px 20px rgba(0,82,204,0.3); }
 
-        .publications a {
-            color: #0052cc;
-            text-decoration: none;
-            border-bottom: 1px dotted #0052cc;
-            transition: border-bottom 0.2s ease;
-        }
+    /* Contact */
+    .info-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap:14px;
+      margin-top:20px;
+    }
+    .info-item{
+      padding:14px;
+      background: rgba(244,247,252,0.46);
+      border-radius:6px;
+      border-left:4px solid rgba(0,82,204,0.85);
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .info-item:hover{
+      transform:translateX(5px);
+      box-shadow:0 4px 12px rgba(0,82,204,0.15);
+      background: rgba(244,247,252,0.54);
+    }
+    .info-item strong{ color: var(--nav); display:block; margin-bottom:4px; }
 
-        .publications a:hover {
-            border-bottom: 1px solid #0052cc;
-        }
+    a{ color: var(--nav2); }
 
-        .skills {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-        }
+    footer{
+      background: var(--nav);
+      color:#fff;
+      text-align:center;
+      padding:20px;
+      font-size:0.9em;
+    }
 
-        .skill-item {
-            padding: 15px;
-            background: linear-gradient(135deg, #003380 0%, #0052cc 100%);
-            color: white;
-            text-align: center;
-            border-radius: 8px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            cursor: default;
-        }
+    a:focus-visible, button:focus-visible{
+      outline:3px solid rgba(0,82,204,0.55);
+      outline-offset:3px;
+      border-radius:6px;
+    }
 
-        .skill-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 82, 204, 0.3);
-        }
+    @media (max-width:800px){
+      .card-grid{ grid-template-columns: repeat(2, 1fr); }
+    }
 
-        footer {
-            background: #003380;
-            color: white;
-            text-align: center;
-            padding: 20px;
-            font-size: 0.9em;
-        }
+    @media (max-width:580px){
+      header h1{ font-size:1.75em; }
+      main.page-body{ padding: 18px 10px; }
+      section{
+        padding:22px 16px;
+        margin-bottom: 64px;
+      }
+      .card-grid{ grid-template-columns: 1fr; }
 
-        a {
-            color: #0052cc;
-        }
+      .menu-toggle{ display:block; }
+      nav ul{
+        flex-direction:column;
+        max-height:0;
+        overflow:hidden;
+        transition:max-height 0.35s ease;
+      }
+      nav ul.show{
+        max-height:70vh;
+        overflow:auto;
+        transition:max-height 0.45s ease;
+      }
+      nav a{
+        padding:12px 20px;
+        border-bottom:1px solid rgba(255,255,255,0.1);
+      }
 
-        @media (max-width: 768px) {
-            .container {
-                border-radius: 0;
-            }
+      body{ background-attachment: scroll; }
+    }
 
-            header h1 {
-                font-size: 1.8em;
-            }
-
-            .content {
-                padding: 20px;
-            }
-
-            .menu-toggle {
-                display: block;
-            }
-
-            nav ul {
-                flex-direction: column;
-                max-height: 0;
-                overflow: hidden;
-                transition: max-height 0.3s ease-out;
-            }
-
-            nav ul.show {
-                max-height: 500px;
-                transition: max-height 0.5s ease-in;
-            }
-
-            nav a {
-                padding: 12px 20px;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            }
-
-            .experience-header {
-                flex-direction: column;
-            }
-
-            .experience-date {
-                margin-left: 0;
-                margin-top: 5px;
-            }
-			
-			#wordCloud {
-                min-height: 300px;
-            }
-        }
-
-        .interests {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            border-left: 4px solid #0052cc;
-            line-height: 1.8;
-        }
-		
-        #wordCloud {
-            background: #f8f9fa;
-            padding: 30px;
-            border-radius: 8px;
-            text-align: center;
-            min-height: 400px;
-			
-            position: relative;
-            overflow: hidden;
-        }
-
-        .word-cloud-item {
-            position: absolute;
-            cursor: default;
-            animation: fadeInWord 0.5s ease-in;
-            white-space: nowrap;
-        }
-
-        @keyframes fadeInWord {
-            from { 
-                opacity: 0; 
-                transform: scale(0.8);
-            }
-            to { 
-                opacity: 1; 
-                transform: scale(1);
-            }
-        }
-
-        @keyframes orbit {
-            from {
-                transform: rotate(0deg) translateX(var(--orbit-radius)) rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg) translateX(var(--orbit-radius)) rotate(-360deg);
-            }
-        }
-
-        @keyframes orbit-reverse {
-            from {
-                transform: rotate(0deg) translateX(var(--orbit-radius)) rotate(0deg);
-            }
-            to {
-                transform: rotate(-360deg) translateX(var(--orbit-radius)) rotate(360deg);
-            }
-        }
-
-        .word-cloud-item:hover {
-            animation-play-state: paused;
-            transform: scale(1.15);
-            transition: transform 0.3s ease;	
-            z-index: 10;
-        }
-
-        .word-cloud-item.size-1 { 
-            font-size: 0.85em; 
-            color: rgba(0, 51, 128, 0.3);
-            animation-duration: 10s;
-        }
-        .word-cloud-item.size-2 { 
-            font-size: 1em; 
-            color: rgba(0, 51, 128, 0.5);
-            animation-duration: 9s;
-        }
-        .word-cloud-item.size-3 { 
-            font-size: 1.2em; 
-            color: rgba(0, 51, 128, 0.7);
-            animation-duration: 8s;
-        }
-        .word-cloud-item.size-4 { 
-            font-size: 1.5em; 
-            color: rgba(0, 82, 204, 0.85);
-            animation-duration: 7s;
-        }
-        .word-cloud-item.size-5 { 
-            font-size: 1.9em; 
-            font-weight: bold; 
-            color: rgba(0, 51, 128, 1);
-            animation-duration: 6s;
-        }
-    </style>
+    @media (prefers-reduced-motion: reduce){
+      *{ animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+      section{ opacity:1; transform:none; }
+      body{ background-attachment: scroll; }
+    }
+  </style>
 </head>
+
 <body>
-    <div class="container">
-        <header>
-            <h1>Eleni Gkiouzepi</h1>
-            <p>PhD Student in Telecommunications | ML Researcher</p>
-        </header>
+  <!-- Background word cloud -->
+  <div id="bgWordCloud" aria-hidden="true"></div>
 
-<nav>
-            <div class="nav-container">
-                <button class="menu-toggle" onclick="toggleMenu()">
-                    <span class="menu-icon">☰</span> Menu
-                </button>
-                <ul id="navMenu">
-                    <li><a href="#about" onclick="closeMenu()">About</a></li>
-                    <li><a href="#research" onclick="closeMenu()">Research</a></li>
-                    <li><a href="#education" onclick="closeMenu()">Education</a></li>
-					<li><a href="#phd"  onclick="closeMenu()">Interactive pages</a></li>
-					<li><a href="#topics"  onclick="closeMenu()">Research Topics
-					</a></li>
-                    <li><a href="#publications" onclick="closeMenu()">Publications</a></li>
-                    <li><a href="#skills" onclick="closeMenu()">Skills</a></li>
-                    <li><a href="#contact" onclick="closeMenu()">Contact</a></li>
-                </ul>
-            </div>
-        </nav>
+  <!-- NAV -->
+  <nav>
+    <button class="menu-toggle" type="button">☰ Menu</button>
+    <ul id="nm">
+      <li><a href="#about">About</a></li>
+      <li><a href="#interests">Interests</a></li>
+      <li><a href="#research">Research</a></li>
+      <li><a href="#education">Education</a></li>
+      <li><a href="#phd">Interactive</a></li>
+      <li><a href="#topics">Topics</a></li>
+      <li><a href="#publications">Publications</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
 
+  <!-- HEADER -->
+  <header>
+    <h1>Eleni Gkiouzepi</h1>
+    <p>PhD Student in Telecommunications | ML Researcher</p>
+  </header>
 
-        <div class="content">
-            <section id="about">
-			<h2>Summary</h2>
-			<div class="interests">
-			<strong>Eleni Gkiouzepi</strong> (Graduate Student Member, IEEE) received <strong>B.Sc. in <em>Mathematics</em></strong> from the National and Kapodistrian University of Athens in 2015 and <strong>M.Sc. in <em>Applied Statistics</em></strong> from Athens University of Economics and Business in 2019. She is currently pursuing the Ph.D. degree with the Communications and Information Theory Chair, <strong>Technical University of Berlin</strong>.<br/>
-From 2020 to 2021, she was with <strong>Université Grenoble Alpes</strong> and worked in the field of privacy and security. Her research interests include <strong><em>cell-free massive MIMO</em></strong> and <strong><em>message passing algorithms</em></strong>.
-			</div>
-                <h2>Personal Information</h2>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <strong>Location</strong>
-                        Berlin, Germany
-                    </div>
-                    <div class="info-item">
-                        <strong>Phone</strong>
-                        <a href="tel:+33*********">+33 (0)* ** ** ** **</a>
-                    </div>
-                    <div class="info-item">
-                        <strong>Email</strong>
-                        <a href="mailto:*****@tu-berlin.de">*****{at}tu-berlin.de</a>
-                    </div>
-                </div>
-            </section>
+  <main class="page-body">
 
-            <section id="interests">
-                <h2>Research Interests</h2>
-                <div class="interests">
-                    Machine learning • Statistics • Massive random access • Cell-free mMIMO • Information theory
-                </div>
-            </section>
+    <!-- Interactive demo pages as cards -->
+    <section id="phd">
+      <h2>Interactive Demo Pages</h2>
+      <div class="card-grid" style="margin-top:18px;">
+        <a class="card card--link" href="dynamic_range_viz.html">
+          <span class="card-label">31/10/2025 v1.1</span>
+          <div class="card-title">Dynamic Range Signal Propagation</div>
+          <div class="card-desc">Explore how dynamic range impacts signal propagation behavior.</div>
+          <span class="card-date">Open →</span>
+        </a>
 
-            <section id="research">
-                <h2>Research Experience</h2>
-                
-                <div class="experience-item">
-                    <div class="experience-header">
-                        <div class="experience-title">
-                            <h3>PhD Student at TU Berlin</h3>
-                            <div class="experience-location">Technische Universität Berlin, Berlin, Germany</div>
-                        </div>
-                        <div class="experience-date">2022 - Present</div>
-                    </div>
-                    <div class="experience-description">
-                        Faculty of Electrical Engineering and Computer Science - Communications and Information Theory Chair<br>
-                        <strong>User-Centric Wireless Networks:</strong><br>
-                        Investigation of Random Access in super-dense cell-free user-centric networks.
-                    </div>
-                </div>
+        <a class="card card--link" href="dip_visualization.html">
+          <span class="card-label">31/10/2025 v1.0</span>
+          <div class="card-title">Delay Intensity Profile (DIP)</div>
+          <div class="card-desc">Visualize DIP for multipath channels and interpret timing/energy structure.</div>
+          <span class="card-date">Open →</span>
+        </a>
 
-                <div class="experience-item">
-                    <div class="experience-header">
-                        <div class="experience-title">
-                            <h3>Research Engineer at CNRS</h3>
-                            <div class="experience-location">University of Grenoble Alpes - LIG Laboratory, Grenoble, France</div>
-                        </div>
-                        <div class="experience-date">2019 - 2021</div>
-                    </div>
-                    <div class="experience-description">
-                        <strong>Collaborative ad transparency:</strong><br>
-                        Development and evaluation of a crowdsourced method to infer why users receive their ads in social media platforms.
-                    </div>
-                </div>
+        <a class="card card--link" href="Simple_network_topology_viz.html">
+          <span class="card-label">31/10/2025 v3.2</span>
+          <div class="card-title">Wireless Network Topology Visualizer</div>
+          <div class="card-desc">Interactively inspect a simplified topology and geometry of nodes/links.</div>
+          <span class="card-date">Open →</span>
+        </a>
 
-                <div class="experience-item">
-                    <div class="experience-header">
-                        <div class="experience-title">
-                            <h3>Research at AUEB</h3>
-                            <div class="experience-location">Athens University of Economics and Business, Athens, Greece</div>
-                        </div>
-                        <div class="experience-date">2018 - 2019</div>
-                    </div>
-                    <div class="experience-description">
-                        <strong>Algebraic Statistics:</strong><br>
-                        Discovery of causal effects (causal relationships) in mixed graphs parametrized with structural equation models.
-                    </div>
-                </div>
-            </section>
+        <a class="card card--link" href="multipath_propagation.html">
+          <span class="card-label">31/10/2025 v0.1</span>
+          <div class="card-title">Multipath Wireless Channel Propagation</div>
+          <div class="card-desc">See multipath propagation effects and how paths combine at the receiver.</div>
+          <span class="card-date">Open →</span>
+        </a>
 
-            <section id="education">
-                <h2>Education</h2>
-                
-                <div class="experience-item">
-                    <div class="experience-header">
-                        <div class="experience-title">
-                            <h3>Master of Applied Statistics</h3>
-                            <div class="experience-location">Athens University of Economics and Business (AUEB), Athens, Greece</div>
-                        </div>
-                        <div class="experience-date">2017 - 2019</div>
-                    </div>
-                    <div class="experience-description">
-                        Department of Statistics<br>
-                        <strong>Dissertation:</strong> <em>Clustering Clickstream Data with timestamps</em> (Semi-supervised learning - Markov chain and EM algorithm)<br>
-                    </div>
-                </div>
+        <a class="card card--link" href="RU_focus_multipath_propagation.html">
+          <span class="card-label">31/10/2025 v0.2</span>
+          <div class="card-title">Phase Differences Across Antenna Array</div>
+          <div class="card-desc">Inspect phase differences across array elements under multipath scenarios.</div>
+          <span class="card-date">Open →</span>
+        </a>
+      </div>
+    </section>
+    <section id="about">
+      <h2>Summary</h2>
+      <div class="summary-box">
+        <strong>Eleni Gkiouzepi</strong> (Graduate Student Member, IEEE) received a <strong>B.Sc. in <em>Mathematics</em></strong>
+        from the National and Kapodistrian University of Athens in 2015 and an <strong>M.Sc. in <em>Applied Statistics</em></strong>
+        from Athens University of Economics and Business in 2019. She is currently pursuing the Ph.D. degree with the Communications
+        and Information Theory Chair, <strong>Technical University of Berlin</strong>.<br /><br />
+        From 2020 to 2021, she was with <strong>Université Grenoble Alpes</strong> and worked in the field of privacy and security.
+        Her research interests include <strong><em>cell-free massive MIMO</em></strong> and <strong><em>message passing algorithms</em></strong>.
+      </div>
+    </section>
 
-                <div class="experience-item">
-                    <div class="experience-header">
-                        <div class="experience-title">
-                            <h3>Ptychion in Mathematics (B.Sc. and M1 equivalent)</h3>
-                            <div class="experience-location">National and Kapodistrian University of Athens (UoA), Athens, Greece</div>
-                        </div>
-                        <div class="experience-date">2015</div>
-                    </div>
-                    <div class="experience-description">
-                        Department of Mathematics<br>
-                        Route of pure mathematics<br>
-                    </div>
-                </div>
-            </section>
-			
-			<section id="phd">
-                <h2>Interactive demo pages</h2>
-                <div class="publications">
-                    <ul>
-					<li>
-					<a href="dynamic_range_viz.html"> Dynamic Range Signal Propagation</a>
-					</li>
-                        <li>
-						<a href="dip_visualization.html">Delay Intensity Profile (DIP) for Multipath Channels</a>
-						</li>
-						<li>
-						<a href="Simple_network_topology_viz.html">Wireless Network Topology Visualizer</a>
-						</li>
-						<li>
-						<a href="multipath_propagation.html">Multipath Wireless Channel Propagation</a>
-						</li>
-						<li>
-						<a href="RU_focus_multipath_propagation.html">Phase Differences Across Antenna Array</a>
-						</li>
-					</ul>
-				</div>
-			</section>
-            <section id="topics">
-                <h2>Research Topics</h2>
-                <div id="wordCloud"></div>
-            </section>
+    <section id="publications">
+      <div class="section-header">
+        <h2>Publications</h2>
+        <a class="see-all" href="publications.html">All publications →</a>
+      </div>
+      <p style="font-size:0.86em;color:#555;margin-bottom:18px;">
+        Most recent work — <a href="publications.html">view full list</a>.
+      </p>
 
-            <section id="publications">
-                <h2>Publications</h2>
-                <div class="publications">
-                    <ol>
-                        <li>Gkiouzepi, E., Jaensch, F., and Caire, G. "Joint Message Detection and User Position Estimation for Cell-Free Networks in Realistic Propagation Environments." <em>IEEE 26th International Workshop on Signal Processing Advances in Wireless Communications (SPAWC),</em> 2025. DOI: <a href="https://doi.org/10.1109/SPAWC66079.2025.11143515" target="_blank">10.1109/SPAWC66079.2025.11143515</a></li>
-                        
-                        <li>Çakmak, B., Gkiouzepi, E., Opper, M., and Caire, G. "Joint Message Detection and Channel Estimation for Unsourced Random Access in Cell-Free User-Centric Wireless Networks." <em>IEEE Transactions on Information Theory,</em> 2024. DOI: <a href="https://doi.org/10.1109/TIT.2025.3541281" target="_blank">10.1109/TIT.2025.3541281</a>.</li>
-                        
-                        <li>Gkiouzepi, E., Çakmak, B., Opper, M., and Caire, G. "2-Step RACH and Unsourced Massive Random Access in Cell-Free User-Centric Networks." <em>58th Asilomar Conference on Signals, Systems, and Computers,</em> pp. 1126–1133, 2024. DOI: <a href="https://doi.org/10.1109/IEEECONF60004.2024.10942639" target="_blank">10.1109/IEEECONF60004.2024.10942639</a>.</li>
-                        
-                        <li>Gkiouzepi, E., Çakmak, B., Opper, M., and Caire, G. "Joint Message Detection, Channel, and User Position Estimation for Unsourced Random Access in Cell-Free Networks." arXiv-Preprint, 2024. DOI: <a href="https://doi.org/10.48550/arXiv.2408.08045" target="_blank">10.48550/arXiv.2408.08045</a>.</li>
-                        
-                        <li>Gkiouzepi, E., Çakmak, B., Opper, M., and Caire, G. "Joint Message Detection, Channel, and User Position Estimation for Unsourced Random Access in Cell-Free Networks." <em>IEEE 25th International Workshop on Signal Processing Advances in Wireless Communications (SPAWC)</em>, 2024. DOI: <a href="https://doi.org/10.1109/SPAWC60668.2024.10694410" target="_blank">10.1109/SPAWC60668.2024.10694410</a>.</li>
-                        
-                        <li>Gkiouzepi, E., Andreou, A., Goga, O., and Loiseau, P. "Collaborative ad transparency: Promises and limitations." <em>Proceedings of IEEE Symposium on Security and Privacy (SP),</em> pp. 2639–2657, 2023. DOI: <a href="https://doi.org/10.1109/SP46215.2023.10179448" target="_blank">10.1109/SP46215.2023.10179448</a>.</li>
-                    </ol>
-                </div>
-            </section>
-
-            <section id="skills">
-                <h2>Programming Skills</h2>
-                <div class="skills">
-                    <div class="skill-item">R</div>
-                    <div class="skill-item">SPSS</div>
-                    <div class="skill-item">MATLAB</div>
-                   <!-- <div class="skill-item">Python</div> -->
-                    <div class="skill-item">Singular</div>
-                    <div class="skill-item">Macaulay2</div>
-                    <div class="skill-item">Mathematica</div>
-                </div>
-            </section>
-
-            <section id="contact">
-                <h2>Contact</h2>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <strong>Email</strong>
-                        <a href="mailto:*****@tu-berlin.de">*****{at}tu-berlin.de</a>
-                    </div>
-                    <div class="info-item">
-                        <strong>Skype</strong>
-                        <a href="skype:live:username?call">live:username</a>
-                    </div>
-                    <div class="info-item">
-                        <strong>Phone</strong>
-                        <a href="tel:+33*********">+33 (0)* ** ** ** **</a>
-                    </div>
-                </div>
-            </section>
+      <div class="card-grid">
+        <div class="card">
+          <span class="card-label">IEEE SPAWC 2025</span>
+          <div class="card-title">Joint Message Detection and User Position Estimation for Cell-Free Networks</div>
+          <div class="card-sub">Gkiouzepi, Jaensch, Caire</div>
+          <div class="card-desc">Realistic propagation environments in cell-free networks.</div>
+          <a class="card-link" href="https://doi.org/10.1109/SPAWC66079.2025.11143515" rel="noopener noreferrer" target="_blank">DOI →</a>
         </div>
 
-        <footer>
-            <p>&copy; 2025 Eleni Gkiouzepi. All rights reserved.</p>
-        </footer>
-    </div>
-	<script>
-	        // Mobile menu toggle
-        function toggleMenu() {
-            const menu = document.getElementById('navMenu');
-            menu.classList.toggle('show');
-        }
+        <div class="card">
+          <span class="card-label">IEEE Trans. Inf. Theory 2024</span>
+          <div class="card-title">Joint Message Detection &amp; Channel Estimation for Unsourced Random Access</div>
+          <div class="card-sub">Çakmak, Gkiouzepi, Opper, Caire</div>
+          <div class="card-desc">Cell-free user-centric wireless networks framework.</div>
+          <a class="card-link" href="https://doi.org/10.1109/TIT.2025.3541281" rel="noopener noreferrer" target="_blank">DOI →</a>
+        </div>
 
-        function closeMenu() {
-            if (window.innerWidth <= 768) {
-                const menu = document.getElementById('navMenu');
-                menu.classList.remove('show');
+        <div class="card">
+          <span class="card-label">Asilomar 2024</span>
+          <div class="card-title">2-Step RACH and Unsourced Massive Random Access in Cell-Free Networks</div>
+          <div class="card-sub">Gkiouzepi, Çakmak, Opper, Caire</div>
+          <div class="card-desc">pp. 1126–1133, Signals, Systems, and Computers.</div>
+          <a class="card-link" href="https://doi.org/10.1109/IEEECONF60004.2024.10942639" rel="noopener noreferrer" target="_blank">DOI →</a>
+        </div>
+      </div>
+    </section>
+    <section id="interests">
+      <h2>Research Interests</h2>
+      <div class="summary-box" style="margin-top:18px;">
+        Machine learning &nbsp;•&nbsp; Statistics &nbsp;•&nbsp; Massive random access &nbsp;•&nbsp; Cell-free mMIMO &nbsp;•&nbsp; Information theory
+      </div>
+    </section>
+
+    <section id="research">
+      <div class="section-header">
+        <h2>Research Experience</h2>
+        <a class="see-all" href="research.html">Full details →</a>
+      </div>
+      <div class="card-grid">
+        <div class="card">
+          <span class="card-label">Current · PhD</span>
+          <div class="card-title">TU Berlin</div>
+          <div class="card-sub">Berlin, Germany</div>
+          <div class="card-desc">Random Access in super-dense cell-free user-centric networks. Comm. &amp; Information Theory Chair.</div>
+          <span class="card-date">2022 – Present</span>
+        </div>
+        <div class="card">
+          <span class="card-label">Research Engineer</span>
+          <div class="card-title">CNRS / Univ. Grenoble Alpes</div>
+          <div class="card-sub">LIG Laboratory, Grenoble, France</div>
+          <div class="card-desc">Collaborative ad transparency — crowdsourced inference of targeted ad reasons in social media.</div>
+          <span class="card-date">2019 – 2021</span>
+        </div>
+        <div class="card">
+          <span class="card-label">Research</span>
+          <div class="card-title">AUEB — Algebraic Statistics</div>
+          <div class="card-sub">Athens, Greece</div>
+          <div class="card-desc">Causal effect discovery in mixed graphs via structural equation models.</div>
+          <span class="card-date">2018 – 2019</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="education">
+      <div class="section-header">
+        <h2>Education</h2>
+        <a class="see-all" href="education.html">Full details →</a>
+      </div>
+      <div class="card-grid">
+        <div class="card">
+          <span class="card-label">M.Sc.</span>
+          <div class="card-title">Applied Statistics</div>
+          <div class="card-sub">Athens Univ. of Economics &amp; Business</div>
+          <div class="card-desc">Dissertation: <em>Clustering Clickstream Data with timestamps</em> — Markov chain &amp; EM algorithm.</div>
+          <span class="card-date">2017 – 2019</span>
+        </div>
+        <div class="card">
+          <span class="card-label">B.Sc. / M1 equivalent</span>
+          <div class="card-title">Mathematics (Ptychion)</div>
+          <div class="card-sub">National &amp; Kapodistrian Univ. of Athens</div>
+          <div class="card-desc">Department of Mathematics — route of pure mathematics.</div>
+          <span class="card-date">2015</span>
+        </div>
+      </div>
+    </section>
+
+
+    <section id="skills">
+      <h2>Programming Skills</h2>
+      <div class="skills">
+        <div class="skill-item">R</div>
+        <div class="skill-item">SPSS</div>
+        <div class="skill-item">MATLAB</div>
+        <div class="skill-item">Singular</div>
+        <div class="skill-item">Macaulay2</div>
+        <div class="skill-item">Mathematica</div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <h2>Contact</h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <strong>Email</strong>
+          <a href="mailto:*****@tu-berlin.de">*****{at}tu-berlin.de</a>
+        </div>
+        <div class="info-item">
+          <strong>Phone</strong>
+          <a href="tel:+33*********">+33 (0)* ** ** ** **</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025-<span id="year"></span> Eleni Gkiouzepi. All rights reserved.</p>
+  </footer>
+
+  <script>
+    (() => {
+      // Footer year
+      const yearEl = document.getElementById('year');
+      if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+      // Mobile menu: accessible toggle + auto-close
+      const menuBtn = document.querySelector('.menu-toggle');
+      const menu = document.getElementById('nm');
+
+      const setExpanded = (expanded) => menuBtn?.setAttribute('aria-expanded', String(expanded));
+
+      if (menuBtn && menu) {
+        menuBtn.setAttribute('aria-controls', 'nm');
+        menuBtn.setAttribute('aria-expanded', 'false');
+
+        menuBtn.addEventListener('click', () => {
+          const isOpen = menu.classList.toggle('show');
+          setExpanded(isOpen);
+        });
+
+        menu.addEventListener('click', (e) => {
+          const a = e.target.closest('a');
+          if (!a) return;
+          if (menu.classList.contains('show')) {
+            menu.classList.remove('show');
+            setExpanded(false);
+          }
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!menu.classList.contains('show')) return;
+          if (!e.target.closest('nav')) {
+            menu.classList.remove('show');
+            setExpanded(false);
+          }
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && menu.classList.contains('show')) {
+            menu.classList.remove('show');
+            setExpanded(false);
+            menuBtn.focus();
+          }
+        });
+      }
+
+      // Scroll reveal with fallback
+      const sections = document.querySelectorAll('section');
+      const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (!prefersReduced && 'IntersectionObserver' in window) {
+        const obs = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              obs.unobserve(entry.target);
             }
-        }
-		
-        // Word cloud data
-        const keywords = [
-            'Active Users', 'Channel Vector', 'Coverage Area', 'Massive Random Access', 'Random Vector',
-            'Wireless Networks', 'Channel Estimation', 'Jacobian Matrix', 'Minimum Mean Square Error',
-            'User Location', 'Base Station', 'Block Length', 'Cell-free Network', 
-            'Channel Estimation Error', 'Cluster Formation', 'Codebook', 'False Alarm',
-            'Linear Approximation', 'Minimum Mean Square Error Estimator', 'Position Estimation',
-            'Unsourced Random Access', 'Access Protocol', 'Achievable Rate', 'Bernoulli Model',
-            'Biased Set', 'Biased Simulations', 'Binary Vector', 'Channel Access', 'Channel State',
-            'Codeword', 'Correct Inference', 'Covariance Matrix', 'Distribution Properties',
-            'Downlink Transmission', 'Estimation Error', 'Fading Coefficient', 'Fading Model',
-            'False Alarm Rate', 'False Discovery Rate', 'Gaussian Process', 'High-dimensional Analysis',
-            'Inference Accuracy', 'Joint Channel Estimation', 'K-means', 'Lipschitz Continuous',
-            'Localization Accuracy'
-        ];
+          });
+        }, { threshold: 0.07 });
 
-        // Shuffle array for random positioning
-        function shuffle(array) {
-            const newArray = [...array];
-            for (let i = newArray.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-            }
-            return newArray;
-        }
+        sections.forEach((s) => obs.observe(s));
+      } else {
+        sections.forEach((s) => s.classList.add('visible'));
+      }
 
-        // Generate word cloud
-        function generateWordCloud() {
-            const wordCloud = document.getElementById('wordCloud');
-            const shuffledKeywords = shuffle(keywords);
-            
-            const cloudWidth = wordCloud.clientWidth;
-            const cloudHeight = 400;
-            const centerX = cloudWidth / 2 + 2 * wordCloud.offsetLeft;
-            const centerY = cloudHeight / 2;
-            
-            shuffledKeywords.forEach((keyword, index) => {
-                const span = document.createElement('span');
-                span.className = 'word-cloud-item';
-                
-                // Assign random sizes (1-5) with emphasis on important terms
-                const importantTerms = ['Random Access', 'Channel Estimation', 'Wireless Networks', 
-                                       'Cell-free Network', 'Unsourced Random Access', 'Position Estimation'];
-                let size;
-                if (importantTerms.includes(keyword)) {
-                    size = 5;
-                } else if (keyword.includes('Estimation') || keyword.includes('Channel')) {
-                    size = Math.floor(Math.random() * 2) + 3; // 3-4
-                } else {
-                    size = Math.floor(Math.random() * 3) + 1; // 1-3
-                }
-                
-                span.classList.add(`size-${size}`);
-                span.textContent = keyword;
-                
-                // Calculate orbit radius based on index (distribute in layers)
-                const layer = index % 4;
-                const orbitRadius = 80 + (layer * 50); // 80px, 130px, 180px, 230px
-                
-                // Random starting angle
-                const startAngle = Math.random() * 360;
-                
-                // Choose direction (clockwise or counter-clockwise)
-                const direction = Math.random() > 0.5 ? 'orbit' : 'orbit-reverse';
-                
-                // Duration based on size (smaller = faster)
-                const duration = 30 +  (5 - size) * 5 + Math.random(); // 15-27 seconds
-                
-                // Random delay
-                const delay = - Math.random() * duration / 5;
-                
-                // Position at center initially
-                span.style.left = centerX + 'px';
-                span.style.top = centerY + 'px';
-                span.style.transform = `rotate(${startAngle}deg) translateX(${orbitRadius}px) rotate(-${startAngle}deg)`;
-                
-                // Set custom property for orbit radius
-                span.style.setProperty('--orbit-radius', orbitRadius + 'px');
-                
-                // Apply animation
-                span.style.animation = `fadeInWord 0.5s ease-in, ${direction} ${duration}s linear ${delay}s infinite`;
-                
-                wordCloud.appendChild(span);
-            });
-        }
+      // ===== Background Word Cloud =====
+      const keywords = [
+        'Active Users','Channel Vector','Coverage Area','Massive Random Access','Random Vector',
+        'Wireless Networks','Channel Estimation','Jacobian Matrix','Min. Mean Square Error',
+        'User Location','Base Station','Block Length','Cell-free Network',
+        'Channel Estimation Error','Cluster Formation','Codebook','False Alarm',
+        'Linear Approximation','MMSE Estimator','Position Estimation',
+        'Unsourced Random Access','Access Protocol','Achievable Rate','Bernoulli Model',
+        'Biased Simulations','Binary Vector','Channel Access','Channel State',
+        'Codeword','Covariance Matrix','Distribution Properties',
+        'Estimation Error','Fading Coefficient','Fading Model',
+        'False Alarm Rate','False Discovery Rate','Gaussian Process',
+        'Inference Accuracy','Joint Channel Estimation','K-means','Lipschitz Continuous',
+        'Localization Accuracy'
+      ];
 
-        // Initialize word cloud on page load
-        document.addEventListener('DOMContentLoaded', generateWordCloud);
-    </script>
+      const important = new Set([
+        'Random Access','Channel Estimation','Wireless Networks','Cell-free Network',
+        'Unsourced Random Access','Position Estimation'
+      ]);
+
+      const shuffle = (arr) => {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+      };
+
+      const pickClass = (word) => {
+        if (important.has(word)) return 5;
+        if (word.includes('Estimation') || word.includes('Channel')) return 3 + Math.floor(Math.random() * 2); // 3-4
+        return 1 + Math.floor(Math.random() * 3); // 1-3
+      };
+
+      const generateBackgroundCloud = () => {
+        const wc = document.getElementById('bgWordCloud');
+        if (!wc) return;
+
+        wc.replaceChildren();
+
+        const w = Math.max(window.innerWidth, 320);
+        const h = Math.max(window.innerHeight, 420);
+
+        const cx = w / 2;
+        const cy = h / 2;
+
+        const baseR = Math.min(w, h) * 0.18;
+        const ringStep = Math.min(w, h) * 0.11;
+
+        const words = shuffle(keywords);
+        const n = words.length;
+
+        words.forEach((word, i) => {
+          const span = document.createElement('span');
+          const sz = pickClass(word);
+
+          span.className = `word-cloud-item wc${sz}`;
+          span.textContent = word;
+
+          const ring = i % 5;
+          const r = baseR + ring * ringStep;
+          const angle = (i / n) * 360 + (Math.random() * 24 - 12);
+
+          const dir = Math.random() > 0.5 ? 'orbit' : 'orbit-reverse';
+          const dur = 60 + (5 - sz) * 10 + Math.random() * 12;
+
+          span.style.left = cx + 'px';
+          span.style.top = cy + 'px';
+          span.style.setProperty('--r', r + 'px');
+          span.style.transform = `rotate(${angle}deg) translateX(${r}px) rotate(-${angle}deg)`;
+
+          if (!prefersReduced) {
+            span.style.animation = `${dir} ${dur}s linear ${-Math.random() * (dur / 3)}s infinite`;
+          }
+
+          wc.appendChild(span);
+        });
+      };
+
+      let t;
+      const schedule = () => {
+        clearTimeout(t);
+        t = setTimeout(generateBackgroundCloud, 150);
+      };
+
+      generateBackgroundCloud();
+      window.addEventListener('resize', schedule, { passive: true });
+    })();
+  </script>
 </body>
 </html>
