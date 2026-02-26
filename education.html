@@ -1,108 +1,456 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Education – Eleni Gkiouzepi</title>
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; line-height:1.6; color:#333; background:linear-gradient(160deg,#d6e4f7 0%,#eaf0fb 40%,#c9d8ee 100%); background-attachment:fixed; min-height:100vh; }
-        nav { background:#003380; position:sticky; top:0; z-index:1000; box-shadow:0 4px 20px rgba(0,51,128,0.35); }
-        .menu-toggle { display:none; background:none; border:none; color:white; font-size:1.4em; padding:14px 20px; cursor:pointer; width:100%; text-align:left; }
-        nav ul { list-style:none; display:flex; justify-content:center; flex-wrap:wrap; }
-        nav a { display:block; color:white; text-decoration:none; padding:14px 20px; font-size:0.88em; letter-spacing:0.4px; transition:background 0.25s; }
-        nav a:hover, nav a.active { background:rgba(255,255,255,0.18); }
-        header { background:linear-gradient(135deg,#003380 0%,#0052cc 100%); color:white; padding:40px 40px 32px; text-align:center; }
-        header h1 { font-size:2.2em; font-weight:300; letter-spacing:2px; margin-bottom:6px; }
-        header p { font-size:1em; opacity:0.85; }
-        .page-body { padding:48px 24px; max-width:1060px; margin:0 auto; }
-        section { background:#fff; border-radius:14px; padding:36px 40px; margin-bottom:36px;
-            box-shadow:0 2px 4px rgba(0,51,128,0.04),0 6px 14px rgba(0,51,128,0.08),0 20px 40px rgba(0,51,128,0.12),0 40px 80px rgba(0,51,128,0.06);
-            opacity:0; transform:translateY(36px);
-            transition:opacity 0.65s cubic-bezier(0.22,1,0.36,1),transform 0.65s cubic-bezier(0.22,1,0.36,1),box-shadow 0.3s ease; }
-        section.visible { opacity:1; transform:translateY(0); }
-        section:hover { box-shadow:0 2px 4px rgba(0,51,128,0.06),0 8px 20px rgba(0,51,128,0.13),0 28px 55px rgba(0,51,128,0.17),0 50px 90px rgba(0,51,128,0.08); }
-        h2 { color:#003380; font-size:1.72em; font-variant:small-caps; padding-bottom:10px; border-bottom:3px solid #0052cc; letter-spacing:1px; margin-bottom:28px; }
-        h3 { color:#0052cc; font-size:1.18em; margin-bottom:4px; }
-        .back-link { display:inline-block; margin-bottom:24px; font-size:0.9em; color:#0052cc; text-decoration:none; border-bottom:1px dotted #0052cc; }
-        .back-link:hover { border-bottom-style:solid; }
-        a { color:#0052cc; }
-        footer { background:#003380; color:white; text-align:center; padding:20px; font-size:0.9em; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Education – Eleni Gkiouzepi</title>
+  <meta name="description" content="Education — Eleni Gkiouzepi." />
 
-        .edu-item {
-            padding:24px 24px 20px; margin-bottom:20px;
-            background:#f4f7fc; border-radius:10px;
-            border-left:4px solid #0052cc;
-            transition:transform 0.2s, box-shadow 0.2s;
-        }
-        .edu-item:hover { transform:translateX(5px); box-shadow:0 6px 18px rgba(0,82,204,0.18); }
-        .edu-header { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; margin-bottom:6px; }
-        .edu-date { color:#666; font-weight:700; font-size:0.9em; white-space:nowrap; margin-left:16px; }
-        .edu-location { color:#0052cc; font-style:italic; font-size:0.92em; margin-bottom:10px; }
-        .edu-desc { color:#555; line-height:1.7; font-size:0.95em; }
-        .edu-label { font-size:0.75em; text-transform:uppercase; letter-spacing:1px; color:#0052cc; font-weight:700; margin-bottom:4px; }
+  <style>
+    :root{
+      --bg1:#d6e4f7;
+      --bg2:#eaf0fb;
+      --bg3:#c9d8ee;
+      --nav:#003380;
+      --nav2:#0052cc;
+      --ink:#333;
+      --muted:#666;
 
-        @media(max-width:580px){
-            header h1{font-size:1.75em;} .page-body{padding:20px 12px;} section{padding:22px 16px;}
-            .menu-toggle{display:block;} nav ul{flex-direction:column;max-height:0;overflow:hidden;transition:max-height 0.3s ease-out;}
-            nav ul.show{max-height:500px;transition:max-height 0.5s ease-in;}
-            nav a{padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.1);}
-            .edu-header{flex-direction:column;} .edu-date{margin-left:0;margin-top:4px;}
-        }
-    </style>
+      --shadow1: 0  2px  4px  rgba(0,51,128,0.04);
+      --shadow2: 0  6px  14px rgba(0,51,128,0.08);
+      --shadow3: 0 20px 40px  rgba(0,51,128,0.12);
+      --shadow4: 0 40px 80px  rgba(0,51,128,0.06);
+    }
+
+    *{ margin:0; padding:0; box-sizing:border-box; }
+
+    body{
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Tahoma, Geneva, Verdana, sans-serif;
+      line-height:1.6;
+      color:var(--ink);
+      background:linear-gradient(160deg,var(--bg1) 0%,var(--bg2) 40%,var(--bg3) 100%);
+      background-attachment:fixed;
+      min-height:100vh;
+      position:relative;
+      overflow-x:hidden;
+    }
+
+    /* ===== Word cloud background layer ===== */
+    #bgWordCloud{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      overflow:hidden;
+      filter:saturate(0.98) contrast(1.02);
+    }
+    .word-cloud-item{
+      position:absolute;
+      white-space:nowrap;
+      will-change:transform;
+      user-select:none;
+      opacity:0.62; /* more visible */
+      text-shadow:0 1px 1px rgba(255,255,255,0.25);
+    }
+    @keyframes orbit{
+      from{ transform:rotate(0deg) translateX(var(--r)) rotate(0deg); }
+      to  { transform:rotate(360deg) translateX(var(--r)) rotate(-360deg); }
+    }
+    @keyframes orbit-reverse{
+      from{ transform:rotate(0deg) translateX(var(--r)) rotate(0deg); }
+      to  { transform:rotate(-360deg) translateX(var(--r)) rotate(360deg); }
+    }
+    .wc1{ font-size:0.80em; color:rgba(0,51,128,0.26); }
+    .wc2{ font-size:0.95em; color:rgba(0,51,128,0.34); }
+    .wc3{ font-size:1.15em; color:rgba(0,51,128,0.42); }
+    .wc4{ font-size:1.45em; color:rgba(0,82,204,0.50); }
+    .wc5{ font-size:1.80em; font-weight:700; color:rgba(0,51,128,0.60); }
+
+    /* Foreground stacking */
+    nav, header, main, footer{ position:relative; z-index:2; }
+
+    nav{
+      background:var(--nav);
+      position:sticky;
+      top:0;
+      z-index:20;
+      box-shadow:0 4px 20px rgba(0,51,128,0.35);
+    }
+    .menu-toggle{
+      display:none;
+      background:none;
+      border:none;
+      color:white;
+      font-size:1.1rem;
+      padding:14px 20px;
+      cursor:pointer;
+      width:100%;
+      text-align:left;
+    }
+    .menu-toggle:hover{ background:rgba(255,255,255,0.1); }
+
+    nav ul{ list-style:none; display:flex; justify-content:center; flex-wrap:wrap; }
+    nav a{
+      display:block;
+      color:white;
+      text-decoration:none;
+      padding:14px 20px;
+      font-size:0.88em;
+      letter-spacing:0.4px;
+      transition:background 0.25s;
+    }
+    nav a:hover, nav a.active{ background:rgba(255,255,255,0.18); }
+
+    header{
+      background:linear-gradient(135deg,var(--nav) 0%,var(--nav2) 100%);
+      color:white;
+      padding:40px 40px 32px;
+      text-align:center;
+    }
+    header h1{ font-size:2.2em; font-weight:300; letter-spacing:2px; margin-bottom:6px; }
+    header p{ font-size:1em; opacity:0.85; }
+
+    main.page-body{
+      padding:28px 12px;
+      max-width:1060px;
+      margin:0 auto;
+    }
+
+    .back-link{
+      display:inline-block;
+      margin: 0 0 38px;
+      font-size:0.9em;
+      color:var(--nav2);
+      text-decoration:none;
+      border-bottom:1px dotted var(--nav2);
+    }
+    .back-link:hover{ border-bottom-style:solid; }
+
+    section{
+      border-radius:14px;
+      padding:26px 28px;
+
+      /* MORE GAP to reveal background */
+      margin-bottom:78px;
+
+      box-shadow:var(--shadow1),var(--shadow2),var(--shadow3),var(--shadow4);
+
+      opacity:0;
+      transform:translateY(36px);
+      transition:
+        opacity 0.65s cubic-bezier(0.22,1,0.36,1),
+        transform 0.65s cubic-bezier(0.22,1,0.36,1),
+        box-shadow 0.3s ease,
+        background 0.3s ease,
+        border-color 0.3s ease;
+
+      scroll-margin-top:84px;
+      content-visibility:auto;
+      contain-intrinsic-size:300px;
+
+      background:rgba(255,255,255,0.30);
+      border:1px solid rgba(255,255,255,0.25);
+
+      backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px);
+    }
+
+    /* requested: transparent visible sections */
+    section.visible{
+      opacity:1;
+      transform:translateY(0);
+      background:rgba(255,255,255,0.02);
+      border-color:rgba(255,255,255,0.18);
+    }
+
+    section:hover{
+      background:rgba(255,255,255,0.05);
+      box-shadow:
+        0  2px  4px  rgba(0,51,128,0.06),
+        0  8px  20px rgba(0,51,128,0.13),
+        0 28px 55px  rgba(0,51,128,0.17),
+        0 50px 90px  rgba(0,51,128,0.08);
+    }
+
+    h2{
+      color:var(--nav);
+      font-size:1.72em;
+      font-variant:small-caps;
+      padding-bottom:10px;
+      border-bottom:3px solid rgba(0,82,204,0.85);
+      letter-spacing:1px;
+      margin-bottom:28px;
+      background:transparent; /* requested */
+    }
+    h3{ color:var(--nav2); font-size:1.18em; margin-bottom:4px; }
+
+    /* Education items: glassy, more transparent */
+    .edu-item{
+      padding:24px 24px 20px;
+      margin-bottom:22px;
+      background:rgba(244,247,252,0.48);
+      border-radius:10px;
+      border-left:4px solid rgba(0,82,204,0.85);
+      transition:transform 0.2s, box-shadow 0.2s, background 0.2s;
+      backdrop-filter:blur(8px);
+      -webkit-backdrop-filter:blur(8px);
+    }
+    .edu-item:hover{
+      transform:translateX(5px);
+      box-shadow:0 6px 18px rgba(0,82,204,0.18);
+      background:rgba(244,247,252,0.56);
+    }
+    .edu-header{ display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; margin-bottom:6px; }
+    .edu-date{ color:var(--muted); font-weight:700; font-size:0.9em; white-space:nowrap; margin-left:16px; }
+    .edu-location{ color:var(--nav2); font-style:italic; font-size:0.92em; margin-bottom:10px; }
+    .edu-desc{ color:#555; line-height:1.7; font-size:0.95em; }
+    .edu-label{ font-size:0.75em; text-transform:uppercase; letter-spacing:1px; color:var(--nav2); font-weight:700; margin-bottom:4px; }
+
+    a{ color:var(--nav2); }
+
+    footer{
+      background:var(--nav);
+      color:white;
+      text-align:center;
+      padding:20px;
+      font-size:0.9em;
+    }
+
+    a:focus-visible, button:focus-visible{
+      outline:3px solid rgba(0,82,204,0.55);
+      outline-offset:3px;
+      border-radius:6px;
+    }
+
+    @media (max-width:580px){
+      header h1{ font-size:1.75em; }
+      main.page-body{ padding:18px 10px; }
+      section{ padding:22px 16px; margin-bottom:64px; }
+
+      .menu-toggle{ display:block; }
+      nav ul{ flex-direction:column; max-height:0; overflow:hidden; transition:max-height 0.35s ease; }
+      nav ul.show{ max-height:70vh; overflow:auto; transition:max-height 0.45s ease; }
+      nav a{ padding:12px 20px; border-bottom:1px solid rgba(255,255,255,0.1); }
+
+      .edu-header{ flex-direction:column; }
+      .edu-date{ margin-left:0; margin-top:4px; }
+
+      body{ background-attachment:scroll; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ animation:none !important; transition:none !important; scroll-behavior:auto !important; }
+      section{ opacity:1; transform:none; }
+      body{ background-attachment:scroll; }
+    }
+  </style>
 </head>
+
 <body>
-<nav>
-    <button class="menu-toggle" onclick="document.getElementById('nm').classList.toggle('show')">☰ Menu</button>
+  <div id="bgWordCloud" aria-hidden="true"></div>
+
+  <nav>
+    <button class="menu-toggle" type="button">☰ Menu</button>
     <ul id="nm">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="index.html#about">About</a></li>
-        <li><a href="research.html">Research</a></li>
-        <li><a href="education.html" class="active">Education</a></li>
-        <li><a href="publications.html">Publications</a></li>
-        <li><a href="index.html#skills">Skills</a></li>
-        <li><a href="index.html#contact">Contact</a></li>
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="index.html#interests">Interests</a></li>
+      <li><a href="research.html">Research</a></li>
+      <li><a class="active" href="education.html">Education</a></li>
+      <li><a href="index.html#phd">Interactive</a></li>
+      <li><a href="publications.html">Publications</a></li>
+      <li><a href="index.html#skills">Skills</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
     </ul>
-</nav>
-<header>
+  </nav>
+
+  <header>
     <h1>Eleni Gkiouzepi</h1>
     <p>Education</p>
-</header>
-<div class="page-body">
+  </header>
+
+  <main class="page-body">
     <a class="back-link" href="index.html">← Back to main page</a>
+
     <section>
-        <h2>Education</h2>
+      <h2>Education</h2>
 
-        <div class="edu-item">
-            <div class="edu-label">M.Sc.</div>
-            <div class="edu-header">
-                <h3>Master of Applied Statistics</h3>
-                <span class="edu-date">2017 – 2019</span>
-            </div>
-            <div class="edu-location">Athens University of Economics and Business (AUEB), Department of Statistics, Athens, Greece</div>
-            <div class="edu-desc">
-                <strong>Dissertation:</strong> <em>Clustering Clickstream Data with timestamps</em><br>
-                A semi-supervised learning approach using Markov chain models and the Expectation-Maximization (EM) algorithm to identify user navigation patterns from timestamped web browsing data. The work combined probabilistic graphical models with applied statistical inference.
-            </div>
+      <div class="edu-item">
+        <div class="edu-label">M.Sc.</div>
+        <div class="edu-header">
+          <h3>Master of Applied Statistics</h3>
+          <span class="edu-date">2017 – 2019</span>
         </div>
+        <div class="edu-location">Athens University of Economics and Business (AUEB), Department of Statistics, Athens, Greece</div>
+        <div class="edu-desc">
+          <strong>Dissertation:</strong> <em>Clustering Clickstream Data with timestamps</em><br />
+          A semi-supervised learning approach using Markov chain models and the Expectation-Maximization (EM) algorithm to identify user navigation patterns from timestamped web browsing data. The work combined probabilistic graphical models with applied statistical inference.
+        </div>
+      </div>
 
-        <div class="edu-item">
-            <div class="edu-label">B.Sc. / M1 equivalent</div>
-            <div class="edu-header">
-                <h3>Ptychion in Mathematics</h3>
-                <span class="edu-date">2015</span>
-            </div>
-            <div class="edu-location">National and Kapodistrian University of Athens (UoA), Department of Mathematics, Athens, Greece</div>
-            <div class="edu-desc">
-                Route of pure mathematics. Coursework included real and complex analysis, abstract algebra, topology, differential geometry, and probability theory. The degree (Ptychion) is a five-year integrated programme equivalent to a B.Sc. and first year of M.Sc. in the European system.
-            </div>
+      <div class="edu-item">
+        <div class="edu-label">B.Sc. / M1 equivalent</div>
+        <div class="edu-header">
+          <h3>Ptychion in Mathematics</h3>
+          <span class="edu-date">2015</span>
         </div>
+        <div class="edu-location">National and Kapodistrian University of Athens (UoA), Department of Mathematics, Athens, Greece</div>
+        <div class="edu-desc">
+          Route of pure mathematics. Coursework included real and complex analysis, abstract algebra, topology, differential geometry, and probability theory. The degree (Ptychion) is a five-year integrated programme equivalent to a B.Sc. and first year of M.Sc. in the European system.
+        </div>
+      </div>
     </section>
-</div>
-<footer><p>&copy; 2025 Eleni Gkiouzepi. All rights reserved.</p></footer>
-<script>
-    const obs = new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('visible');obs.unobserve(x.target);}}),{threshold:0.07});
-    document.querySelectorAll('section').forEach(s=>obs.observe(s));
-</script>
+  </main>
+
+  <footer><p>&copy; <span id="year"></span> Eleni Gkiouzepi. All rights reserved.</p></footer>
+
+  <script>
+    (() => {
+      // Footer year
+      const yearEl = document.getElementById('year');
+      if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+      // Mobile menu (toggle + close on link click/outside/Esc)
+      const menuBtn = document.querySelector('.menu-toggle');
+      const menu = document.getElementById('nm');
+      const setExpanded = (v) => menuBtn?.setAttribute('aria-expanded', String(v));
+
+      if (menuBtn && menu) {
+        menuBtn.setAttribute('aria-controls', 'nm');
+        menuBtn.setAttribute('aria-expanded', 'false');
+
+        menuBtn.addEventListener('click', () => {
+          const open = menu.classList.toggle('show');
+          setExpanded(open);
+        });
+
+        menu.addEventListener('click', (e) => {
+          const a = e.target.closest('a');
+          if (!a) return;
+          if (menu.classList.contains('show')) {
+            menu.classList.remove('show');
+            setExpanded(false);
+          }
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!menu.classList.contains('show')) return;
+          if (!e.target.closest('nav')) {
+            menu.classList.remove('show');
+            setExpanded(false);
+          }
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && menu.classList.contains('show')) {
+            menu.classList.remove('show');
+            setExpanded(false);
+            menuBtn.focus();
+          }
+        });
+      }
+
+      // Reveal sections (with fallback)
+      const sections = document.querySelectorAll('section');
+      const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (!prefersReduced && 'IntersectionObserver' in window) {
+        const obs = new IntersectionObserver((entries) => {
+          entries.forEach((x) => {
+            if (x.isIntersecting) {
+              x.target.classList.add('visible');
+              obs.unobserve(x.target);
+            }
+          });
+        }, { threshold: 0.07 });
+        sections.forEach((s) => obs.observe(s));
+      } else {
+        sections.forEach((s) => s.classList.add('visible'));
+      }
+
+      // Background word cloud
+      const keywords = [
+        'Active Users','Channel Vector','Coverage Area','Massive Random Access','Random Vector',
+        'Wireless Networks','Channel Estimation','Jacobian Matrix','Min. Mean Square Error',
+        'User Location','Base Station','Block Length','Cell-free Network',
+        'Channel Estimation Error','Cluster Formation','Codebook','False Alarm',
+        'Linear Approximation','MMSE Estimator','Position Estimation',
+        'Unsourced Random Access','Access Protocol','Achievable Rate','Bernoulli Model',
+        'Biased Simulations','Binary Vector','Channel Access','Channel State',
+        'Codeword','Covariance Matrix','Distribution Properties',
+        'Estimation Error','Fading Coefficient','Fading Model',
+        'False Alarm Rate','False Discovery Rate','Gaussian Process',
+        'Inference Accuracy','Joint Channel Estimation','K-means','Lipschitz Continuous',
+        'Localization Accuracy'
+      ];
+
+      const important = new Set([
+        'Random Access','Channel Estimation','Wireless Networks','Cell-free Network',
+        'Unsourced Random Access','Position Estimation'
+      ]);
+
+      const shuffle = (arr) => {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+      };
+
+      const pickClass = (word) => {
+        if (important.has(word)) return 5;
+        if (word.includes('Estimation') || word.includes('Channel')) return 3 + Math.floor(Math.random() * 2);
+        return 1 + Math.floor(Math.random() * 3);
+      };
+
+      const generateBackgroundCloud = () => {
+        const wc = document.getElementById('bgWordCloud');
+        if (!wc) return;
+
+        wc.replaceChildren();
+
+        const w = Math.max(window.innerWidth, 320);
+        const h = Math.max(window.innerHeight, 420);
+        const cx = w / 2;
+        const cy = h / 2;
+
+        const baseR = Math.min(w, h) * 0.18;
+        const ringStep = Math.min(w, h) * 0.11;
+
+        const words = shuffle(keywords);
+        const n = words.length;
+
+        words.forEach((word, i) => {
+          const span = document.createElement('span');
+          const sz = pickClass(word);
+          span.className = `word-cloud-item wc${sz}`;
+          span.textContent = word;
+
+          const ring = i % 5;
+          const r = baseR + ring * ringStep;
+          const angle = (i / n) * 360 + (Math.random() * 24 - 12);
+
+          const dir = Math.random() > 0.5 ? 'orbit' : 'orbit-reverse';
+          const dur = 60 + (5 - sz) * 10 + Math.random() * 12;
+
+          span.style.left = cx + 'px';
+          span.style.top = cy + 'px';
+          span.style.setProperty('--r', r + 'px');
+          span.style.transform = `rotate(${angle}deg) translateX(${r}px) rotate(-${angle}deg)`;
+
+          if (!prefersReduced) {
+            span.style.animation = `${dir} ${dur}s linear ${-Math.random() * (dur / 3)}s infinite`;
+          }
+
+          wc.appendChild(span);
+        });
+      };
+
+      let t;
+      const schedule = () => { clearTimeout(t); t = setTimeout(generateBackgroundCloud, 150); };
+      generateBackgroundCloud();
+      window.addEventListener('resize', schedule, { passive: true });
+    })();
+  </script>
 </body>
 </html>
