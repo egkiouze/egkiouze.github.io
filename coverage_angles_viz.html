@@ -256,7 +256,7 @@
             position: relative;
             overflow: hidden;
             background: #fafbfd;
-            min-height: 600px;
+            min-height: 500px;
         }
 
         canvas {
@@ -346,7 +346,7 @@
 		}
 
         /* Responsive */
-        @media (max-width: 900px) {
+        @media (max-width: 800px) {
             .main-layout {
                 grid-template-columns: 1fr;
             }
@@ -359,905 +359,1187 @@
     </style>
 </head>
 <body>
-<div class="page-container">
-    <header>
-        <h1>📡 <span>RU Sector Coverage</span> Visualizer</h1>
-        <a class="home-link" href="index.html">🏠 Home</a>
-    </header>
-
-    <div class="main-layout">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="panel">
-                <div class="panel-title">Sectorization Mode</div>
-                <div class="mode-toggle">
-                    <button class="mode-btn active" id="btn120" onclick="setMode(120)">120° Hexagonal</button>
-                    <button class="mode-btn" id="btn60" onclick="setMode(60)">60° Triangular</button>
+    <div class="page-container">
+        <header>
+            <h1>📡 <span>RU Sector Coverage</span> Visualizer</h1>
+            <a class="home-link" href="index.html#phd">🏠 Home</a>
+        </header>
+     
+        <div class="main-layout">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="panel">
+                    <div class="panel-title">Sectorization Mode</div>
+                    <div class="mode-toggle">
+                        <button class="mode-btn active" id="btn120" onclick="setMode(120)">120° Hexagonal</button>
+                        <button class="mode-btn" id="btn60" onclick="setMode(60)">60° Triangular</button>
+                    </div>
+                    <div class="mode-toggle">
+                        <button class="mode-btn active" id="btnBoth" onclick="setMode('both')">Show Both</button>
+                        <button class="mode-btn" id="btnNone" onclick="setMode('none')">None</button>
+                    </div>
                 </div>
-                <div class="mode-toggle">
-                    <button class="mode-btn active" id="btnBoth" onclick="setMode('both')">Show Both</button>
-                    <button class="mode-btn" id="btnNone" onclick="setMode('none')">None</button>
+     
+                <div class="panel">
+                    <div class="panel-title">Network Configuration</div>
+     
+                    <div class="control-row">
+                        <div class="control-label">
+                            <span>Number of RUs</span>
+                            <span class="control-value" id="valRUs">—</span>
+                        </div>
+                        <input type="range" id="sliderRings" min="1" max="5" value="2" oninput="updateConfig()">
+                        <div style="display:flex;justify-content:space-between;font-size:0.7em;color:#999;margin-top:2px;">
+                            <span>fewer</span><span>more</span>
+                        </div>
+                    </div>
+     
+                    <div class="control-row">
+                        <div class="control-label">
+                            <span>Triangle Side Length</span>
+                            <span class="control-value" id="valISD">200 m</span>
+                        </div>
+                        <input type="range" id="sliderISD" min="80" max="400" value="200" step="10" oninput="updateConfig()">
+                    </div>
+     
+                    <div class="control-row">
+                        <div class="control-label">
+                            <span>RU Circle Radius</span>
+                            <span class="control-value" id="valCircleR">10 px</span>
+                        </div>
+                        <input type="range" id="sliderCircleR" min="3" max="30" value="10" oninput="updateConfig()">
+                    </div>
+     
+                    <div class="control-row">
+                        <div class="control-label">
+                            <span>Sector Radius</span>
+                            <span class="control-value" id="valRadius">80%</span>
+                        </div>
+                        <input type="range" id="sliderRadius" min="30" max="100" value="80" oninput="updateConfig()">
+                    </div>
+     
+                    <div class="control-row">
+                        <div class="control-label">
+                            <span>Sector Opacity</span>
+                            <span class="control-value" id="valOpacity">25%</span>
+                        </div>
+                        <input type="range" id="sliderOpacity" min="5" max="60" value="25" oninput="updateConfig()">
+                    </div>
+     
+                    <div class="control-row">
+                        <div class="control-label">
+                            <span>RU Label Size</span>
+                            <span class="control-value" id="valRULabelSize">10 px</span>
+                        </div>
+                        <input type="range" id="sliderRULabelSize" min="5" max="24" value="10" oninput="draw()">
+                    </div>
+     
+                    <div class="control-row">
+                        <div class="control-label">
+                            <span>Location Label Size</span>
+                            <span class="control-value" id="valLocLabelSize">10 px</span>
+                        </div>
+                        <input type="range" id="sliderLocLabelSize" min="5" max="24" value="10" oninput="draw()">
+                    </div>
+     
+                    <div class="control-row">
+                        <div class="control-label">
+                            <span>Location Triangle Size</span>
+                            <span class="control-value" id="valLocTriSize">6 px</span>
+                        </div>
+                        <input type="range" id="sliderLocTriSize" min="3" max="20" value="6" oninput="draw()">
+                    </div>
+                </div>
+     
+                <div class="panel">
+                    <div class="panel-title">Visualization Options</div>
+                    <div class="checkbox-group">
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="chkHexGrid" checked onchange="updateConfig()">
+                            <span>Show hexagonal cells</span>
+                        </label>
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="chkTriGrid" onchange="updateConfig()">
+                            <span>Show triangular grid</span>
+                        </label>
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="chkSectorLines" checked onchange="updateConfig()">
+                            <span>Show sector boundary lines</span>
+                        </label>
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="chkRULabels" checked onchange="updateConfig()">
+                            <span>Show RU labels</span>
+                        </label>
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="chkSectorLabels" checked onchange="draw()">
+                            <span>Show sector labels</span>
+                        </label>
+                    </div>
+     
+                    <div class="control-row" style="margin-top:10px;">
+                        <div class="control-label">
+                            <span>Sector Label Opacity</span>
+                            <span class="control-value" id="valSectorLabelOp">20%</span>
+                        </div>
+                        <input type="range" id="sliderSectorLabelOp" min="5" max="100" value="20" oninput="draw()">
+                    </div>
+     
+                    <div class="control-row">
+                        <div class="control-label">
+                            <span>Sector Label Size</span>
+                            <span class="control-value" id="valSectorLabelSize">18 px</span>
+                        </div>
+                        <input type="range" id="sliderSectorLabelSize" min="8" max="40" value="18" oninput="draw()">
+                    </div>
+     
+                    <div class="checkbox-group" style="margin-top:10px;">
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="chkLocationCenters" checked onchange="draw()">
+                            <span>Show location centers</span>
+                        </label>
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="chkLocationLabels" checked onchange="draw()">
+                            <span>Show location labels</span>
+                        </label>
+                    </div>
+     
+                    <div style="border-top:1px solid #e0e6ed;margin-top:14px;padding-top:14px;">
+                        <div class="checkbox-group">
+                            <label class="checkbox-row">
+                                <input type="checkbox" id="chkSectorFill" onchange="draw()">
+                                <span>Fill sector backgrounds</span>
+                            </label>
+                        </div>
+                        <div class="control-row" style="margin-top:8px;">
+                            <div class="control-label">
+                                <span>Sector Fill Opacity</span>
+                                <span class="control-value" id="valSectorFillOp">15%</span>
+                            </div>
+                            <input type="range" id="sliderSectorFillOp" min="3" max="60" value="15" oninput="draw()">
+                        </div>
+                    </div>
+     
+                    <div style="border-top:1px solid #e0e6ed;margin-top:14px;padding-top:14px;">
+                        <div class="checkbox-group">
+                            <label class="checkbox-row">
+                                <input type="checkbox" id="chkLocFill" onchange="draw()">
+                                <span>Fill location backgrounds</span>
+                            </label>
+                        </div>
+                        <div class="control-row" style="margin-top:8px;">
+                            <div class="control-label">
+                                <span>Location Fill Opacity</span>
+                                <span class="control-value" id="valLocFillOp">15%</span>
+                            </div>
+                            <input type="range" id="sliderLocFillOp" min="3" max="60" value="15" oninput="draw()">
+                        </div>
+                    </div>
+                </div>
+     
+                <div class="panel">
+                    <div class="panel-title">Highlight</div>
+                    <div class="control-row">
+                        <div class="control-label"><span>Highlight RU</span></div>
+                        <select id="selectRU" onchange="draw()" style="width:100%;padding:6px 10px;border-radius:4px;border:1px solid #ccc;font-family:inherit;font-size:0.9em;">
+                            <option value="-1">None</option>
+                        </select>
+                    </div>
+                    <div class="control-row" style="margin-top:10px;">
+                        <div class="control-label"><span>Highlight Sector</span></div>
+                        <select id="selectSector" onchange="draw()" style="width:100%;padding:6px 10px;border-radius:4px;border:1px solid #ccc;font-family:inherit;font-size:0.9em;">
+                            <option value="-1">None</option>
+                        </select>
+                    </div>
+                    <div class="control-row" style="margin-top:10px;">
+                        <div class="control-label"><span>Highlight Location</span></div>
+                        <select id="selectLocation" onchange="draw()" style="width:100%;padding:6px 10px;border-radius:4px;border:1px solid #ccc;font-family:inherit;font-size:0.9em;">
+                            <option value="-1">None</option>
+                        </select>
+                    </div>
+                </div>
+     
+                <div class="panel">
+                    <div class="panel-title">Network Statistics</div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="statRUs">0</div>
+                            <div class="stat-label">Radio Units</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="statSectors">0</div>
+                            <div class="stat-label">Vertices</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="statLocations">0</div>
+                            <div class="stat-label">Locations</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="statAngle">120°</div>
+                            <div class="stat-label">Beamwidth</div>
+                        </div>
+                    </div>
+                </div>
+     
+                <div class="panel">
+                    <div class="panel-title">About</div>
+                    <div class="description-box">
+                        <strong>120° Hexagonal Sectors:</strong> 3 RUs per vertex, each covering one adjacent hexagonal cell (sector). The boresight points toward the cell center.<br><br>
+                        <strong>60° Triangular Sectors:</strong> 6 RUs per vertex, each covering one triangular sub-region (location). Sector boundaries align with RU–RU edges.<br><br>
+                        <strong>Sectors</strong> are the hexagonal cell regions. <strong>Locations</strong> are the triangular regions formed between 3 adjacent vertices, each served by its surrounding RUs.
+                    </div>
                 </div>
             </div>
-
-            <div class="panel">
-                <div class="panel-title">Network Configuration</div>
-
-                <div class="control-row">
-                    <div class="control-label">
-                        <span>Number of RUs</span>
-                        <span class="control-value" id="valRUs">—</span>
+     
+            <!-- Canvas -->
+            <div class="canvas-area" id="canvasArea">
+                <canvas id="mainCanvas"></canvas>
+                <div class="legend" id="legend">
+                    <div class="legend-title">Legend</div>
+                    <div class="legend-item">
+                        <div class="legend-circle" style="border-color:#003380;background:#0052cc;"></div>
+                        <span>Radio Unit (RU)</span>
                     </div>
-                    <input type="range" id="sliderRings" min="1" max="5" value="2" oninput="updateConfig()">
-                    <div style="display:flex;justify-content:space-between;font-size:0.7em;color:#999;margin-top:2px;">
-                        <span>fewer</span><span>more</span>
+                    <div class="legend-item">
+                        <div class="legend-triangle" style="border-bottom-color:#e63946;"></div>
+                        <span>Location Center</span>
                     </div>
-                </div>
-
-                <div class="control-row">
-                    <div class="control-label">
-                        <span>Triangle Side Length</span>
-                        <span class="control-value" id="valISD">200 m</span>
+                    <div class="legend-item">
+                        <div class="legend-swatch" style="background:rgba(0,82,204,0.25);"></div>
+                        <span>120° Sector</span>
                     </div>
-                    <input type="range" id="sliderISD" min="80" max="400" value="200" step="10" oninput="updateConfig()">
-                </div>
-
-                <div class="control-row">
-                    <div class="control-label">
-                        <span>RU Circle Radius</span>
-                        <span class="control-value" id="valCircleR">10 px</span>
-                    </div>
-                    <input type="range" id="sliderCircleR" min="3" max="30" value="10" oninput="updateConfig()">
-                </div>
-
-                <div class="control-row">
-                    <div class="control-label">
-                        <span>Sector Radius</span>
-                        <span class="control-value" id="valRadius">80%</span>
-                    </div>
-                    <input type="range" id="sliderRadius" min="30" max="100" value="80" oninput="updateConfig()">
-                </div>
-
-                <div class="control-row">
-                    <div class="control-label">
-                        <span>Sector Opacity</span>
-                        <span class="control-value" id="valOpacity">25%</span>
-                    </div>
-                    <input type="range" id="sliderOpacity" min="5" max="60" value="25" oninput="updateConfig()">
-                </div>
-
-                <div class="control-row">
-                    <div class="control-label">
-                        <span>RU Label Size</span>
-                        <span class="control-value" id="valRULabelSize">10 px</span>
-                    </div>
-                    <input type="range" id="sliderRULabelSize" min="5" max="24" value="10" oninput="draw()">
-                </div>
-
-                <div class="control-row">
-                    <div class="control-label">
-                        <span>Location Label Size</span>
-                        <span class="control-value" id="valLocLabelSize">10 px</span>
-                    </div>
-                    <input type="range" id="sliderLocLabelSize" min="5" max="24" value="10" oninput="draw()">
-                </div>
-
-                <div class="control-row">
-                    <div class="control-label">
-                        <span>Location Triangle Size</span>
-                        <span class="control-value" id="valLocTriSize">6 px</span>
-                    </div>
-                    <input type="range" id="sliderLocTriSize" min="3" max="20" value="6" oninput="draw()">
-                </div>
-            </div>
-
-            <div class="panel">
-                <div class="panel-title">Visualization Options</div>
-                <div class="checkbox-group">
-                    <label class="checkbox-row">
-                        <input type="checkbox" id="chkHexGrid" checked onchange="updateConfig()">
-                        <span>Show hexagonal cells</span>
-                    </label>
-                    <label class="checkbox-row">
-                        <input type="checkbox" id="chkTriGrid" onchange="updateConfig()">
-                        <span>Show triangular grid</span>
-                    </label>
-                    <label class="checkbox-row">
-                        <input type="checkbox" id="chkSectorLines" checked onchange="updateConfig()">
-                        <span>Show sector boundary lines</span>
-                    </label>
-                    <label class="checkbox-row">
-                        <input type="checkbox" id="chkRULabels" checked onchange="updateConfig()">
-                        <span>Show RU labels</span>
-                    </label>
-                    <label class="checkbox-row">
-                        <input type="checkbox" id="chkSectorLabels" checked onchange="draw()">
-                        <span>Show sector labels</span>
-                    </label>
-                </div>
-
-                <div class="control-row" style="margin-top:10px;">
-                    <div class="control-label">
-                        <span>Sector Label Opacity</span>
-                        <span class="control-value" id="valSectorLabelOp">20%</span>
-                    </div>
-                    <input type="range" id="sliderSectorLabelOp" min="5" max="100" value="20" oninput="draw()">
-                </div>
-
-                <div class="control-row">
-                    <div class="control-label">
-                        <span>Sector Label Size</span>
-                        <span class="control-value" id="valSectorLabelSize">18 px</span>
-                    </div>
-                    <input type="range" id="sliderSectorLabelSize" min="8" max="40" value="18" oninput="draw()">
-                </div>
-
-                <div class="checkbox-group" style="margin-top:10px;">
-                    <label class="checkbox-row">
-                        <input type="checkbox" id="chkLocationCenters" checked onchange="updateConfig()">
-                        <span>Show location centers</span>
-                    </label>
-                    <label class="checkbox-row">
-                        <input type="checkbox" id="chkLocationLabels" checked onchange="updateConfig()">
-                        <span>Show location labels</span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="panel">
-                <div class="panel-title">Highlight</div>
-                <div class="control-row">
-                    <div class="control-label"><span>Highlight RU</span></div>
-                    <select id="selectRU" onchange="draw()" style="width:100%;padding:6px 10px;border-radius:4px;border:1px solid #ccc;font-family:inherit;font-size:0.9em;">
-                        <option value="-1">None (show all)</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="panel">
-                <div class="panel-title">Network Statistics</div>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-number" id="statRUs">0</div>
-                        <div class="stat-label">Radio Units</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="statSectors">0</div>
-                        <div class="stat-label">Vertices</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="statLocations">0</div>
-                        <div class="stat-label">Locations</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="statAngle">120°</div>
-                        <div class="stat-label">Beamwidth</div>
+                    <div class="legend-item">
+                        <div class="legend-swatch" style="background:rgba(230,57,70,0.25);"></div>
+                        <span>60° Sector</span>
                     </div>
                 </div>
-            </div>
-
-            <div class="panel">
-                <div class="panel-title">About</div>
-                <div class="description-box">
-                    <strong>120° Hexagonal Sectors:</strong> 3 RUs per vertex, each covering one adjacent hexagonal cell (sector). The boresight points toward the cell center.<br><br>
-                    <strong>60° Triangular Sectors:</strong> 6 RUs per vertex, each covering one triangular sub-region (location). Sector boundaries align with RU–RU edges.<br><br>
-                    <strong>Sectors</strong> are the hexagonal cell regions. <strong>Locations</strong> are the triangular regions formed between 3 adjacent vertices, each served by its surrounding RUs.
-                </div>
+                <div class="canvas-hint">🖱️ Drag to pan · Scroll to zoom</div>
             </div>
         </div>
-
-        <!-- Canvas -->
-        <div class="canvas-area" id="canvasArea">
-            <canvas id="mainCanvas"></canvas>
-            <div class="legend" id="legend">
-                <div class="legend-title">Legend</div>
-                <div class="legend-item">
-                    <div class="legend-circle" style="border-color:#003380;background:#0052cc;"></div>
-                    <span>Radio Unit (RU)</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-triangle" style="border-bottom-color:#e63946;"></div>
-                    <span>Location Center</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-swatch" style="background:rgba(0,82,204,0.25);"></div>
-                    <span>120° Sector</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-swatch" style="background:rgba(230,57,70,0.25);"></div>
-                    <span>60° Sector</span>
-                </div>
-            </div>
-            <div class="canvas-hint">🖱️ Drag to pan · Scroll to zoom</div>
-        </div>
-    </div>
-
-    <footer><p><span class="copyleft">©</span> 2025 Eleni Gkiouzepi. GNU General Public License with attribution and proper citation required.</p></footer>
+     
+        <footer><p><span class="copyleft">©</span> 2025 Eleni Gkiouzepi. GNU General Public License with attribution and proper citation required.</p></footer>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════════════
-// Core state
-// ═══════════════════════════════════════════════════════════════
-const canvas = document.getElementById('mainCanvas');
-const ctx = canvas.getContext('2d');
-const area = document.getElementById('canvasArea');
-
-let W, H;
-let panX = 0, panY = 0, zoom = 1;
-let dragging = false, dragStartX, dragStartY, panStartX, panStartY;
-
-let mode = 'both'; // 120, 60, 'both', 'none'
-let vertexPositions = [];   // grid vertices (where antennas are co-located)
-let sectorRUs = [];         // one entry per RU = per sector
-let locationPositions = [];
-let hexCenters = [];
-
-// Sector color palettes
-const sector120Colors = [
-    { h: 210, s: 85, l: 45 },  // Blue
-    { h: 140, s: 60, l: 38 },  // Green
-    { h: 30,  s: 80, l: 50 },  // Orange
-];
-const sector60Colors = [
-    { h: 0,   s: 75, l: 50 },  // Red
-    { h: 210, s: 85, l: 45 },  // Blue
-    { h: 50,  s: 80, l: 45 },  // Yellow
-    { h: 280, s: 60, l: 50 },  // Purple
-    { h: 160, s: 70, l: 38 },  // Teal
-    { h: 20,  s: 85, l: 52 },  // Orange-red
-];
-
-const locationColors = [
-    '#e63946', '#2a9d8f', '#264673', '#e9c46a',
-    '#9b59b6', '#f97316', '#06b6d4', '#84cc16',
-    '#ec4899', '#6366f1', '#14b8a6', '#f59e0b',
-];
-
-// ═══════════════════════════════════════════════════════════════
-// Hex grid generation — CORRECT GEOMETRY
-//
-// 1. Hex CELL centers live on a hexagonal grid (cube coords).
-// 2. RUs sit at the VERTICES of those hexagons (= triangular lattice).
-// 3. Each vertex is shared by exactly 3 hex cells.
-// 4. Location centers = centroids of equilateral triangles formed
-//    by 3 mutually-adjacent RUs.
-// ═══════════════════════════════════════════════════════════════
-
-function generateNetwork(rings, triSide) {
-    // triSide = hex side length = a
-    // RUs sit at ALTERNATING vertices of the hexagonal grid (3 out of 6 per hex).
-    // Vertex k-parity is globally consistent: even-k vertices form sublattice A,
-    // odd-k vertices form sublattice B. We keep one sublattice.
-    const a = triSide;
-    const sqrt3 = Math.sqrt(3);
-
-    // ── Hex cell centers (cube coordinates, flat-top orientation) ──
-    const hexCenters = [];
-    for (let q = -rings; q <= rings; q++) {
-        for (let r = -rings; r <= rings; r++) {
-            const s = -q - r;
-            if (Math.abs(s) > rings) continue;
-            const cx = a * (3 / 2) * q;
-            const cy = a * (sqrt3 / 2 * q + sqrt3 * r);
-            hexCenters.push({ x: cx, y: cy, q, r, s, idx: hexCenters.length });
-        }
-    }
-
-    // ── All hex vertices, tagged with k-parity for sublattice ──
-    const vertexMap = new Map();
-    const precision = 100;
-
-    hexCenters.forEach((c, ci) => {
-        for (let k = 0; k < 6; k++) {
-            const angle = (Math.PI / 3) * k;
-            const vx = c.x + a * Math.cos(angle);
-            const vy = c.y + a * Math.sin(angle);
-            const key = Math.round(vx * precision) + ',' + Math.round(vy * precision);
-            if (!vertexMap.has(key)) {
-                vertexMap.set(key, { x: vx, y: vy, adjHexIndices: [ci], kParity: k % 2 });
-            } else {
-                vertexMap.get(key).adjHexIndices.push(ci);
-                // k-parity is globally consistent, but just in case keep first
+    // ═══════════════════════════════════════════════════════════════
+    // Core state
+    // ═══════════════════════════════════════════════════════════════
+    const canvas = document.getElementById('mainCanvas');
+    const ctx = canvas.getContext('2d');
+    const area = document.getElementById('canvasArea');
+     
+    let W, H;
+    let panX = 0, panY = 0, zoom = 1;
+    let dragging = false, dragStartX, dragStartY, panStartX, panStartY;
+     
+    let mode = 'both'; // 120, 60, 'both', 'none'
+    let vertexPositions = [];   // grid vertices (where antennas are co-located)
+    let sectorRUs = [];         // one entry per RU = per sector
+    let locationPositions = [];
+    let hexCenters = [];
+     
+    // Sector color palettes
+    const sector120Colors = [
+        { h: 210, s: 85, l: 45 },  // Blue
+        { h: 140, s: 60, l: 38 },  // Green
+        { h: 30,  s: 80, l: 50 },  // Orange
+    ];
+    const sector60Colors = [
+        { h: 0,   s: 75, l: 50 },  // Red
+        { h: 210, s: 85, l: 45 },  // Blue
+        { h: 50,  s: 80, l: 45 },  // Yellow
+        { h: 280, s: 60, l: 50 },  // Purple
+        { h: 160, s: 70, l: 38 },  // Teal
+        { h: 20,  s: 85, l: 52 },  // Orange-red
+    ];
+     
+    const locationColors = [
+        '#e63946', '#2a9d8f', '#264673', '#e9c46a',
+        '#9b59b6', '#f97316', '#06b6d4', '#84cc16',
+        '#ec4899', '#6366f1', '#14b8a6', '#f59e0b',
+    ];
+     
+    // ═══════════════════════════════════════════════════════════════
+    // Hex grid generation — CORRECT GEOMETRY
+    //
+    // 1. Hex CELL centers live on a hexagonal grid (cube coords).
+    // 2. RUs sit at the VERTICES of those hexagons (= triangular lattice).
+    // 3. Each vertex is shared by exactly 3 hex cells.
+    // 4. Location centers = centroids of equilateral triangles formed
+    //    by 3 mutually-adjacent RUs.
+    // ═══════════════════════════════════════════════════════════════
+     
+    function generateNetwork(rings, triSide) {
+        // triSide = hex side length = a
+        // RUs sit at ALTERNATING vertices of the hexagonal grid (3 out of 6 per hex).
+        // Vertex k-parity is globally consistent: even-k vertices form sublattice A,
+        // odd-k vertices form sublattice B. We keep one sublattice.
+        const a = triSide;
+        const sqrt3 = Math.sqrt(3);
+     
+        // ── Hex cell centers (cube coordinates, flat-top orientation) ──
+        const hexCenters = [];
+        for (let q = -rings; q <= rings; q++) {
+            for (let r = -rings; r <= rings; r++) {
+                const s = -q - r;
+                if (Math.abs(s) > rings) continue;
+                const cx = a * (3 / 2) * q;
+                const cy = a * (sqrt3 / 2 * q + sqrt3 * r);
+                hexCenters.push({ x: cx, y: cy, q, r, s, idx: hexCenters.length });
             }
         }
-    });
-
-    // ── Keep only ONE sublattice (even-k vertices = 0°,120°,240°) ──
-    const rus = [];
-    vertexMap.forEach(v => {
-        if (v.kParity === 0) { // keep alternating vertices
-            v.idx = rus.length;
-            rus.push(v);
-        }
-    });
-
-    // ── Build adjacency to hex centers, sorted by angle ──
-    rus.forEach(ru => {
-        ru.adjHexAngles = ru.adjHexIndices
-            .map(hi => ({
-                hi,
-                angle: Math.atan2(hexCenters[hi].y - ru.y, hexCenters[hi].x - ru.x)
-            }))
-            .sort((a, b) => a.angle - b.angle);
-    });
-
-    // ── Location centers ──
-    // Adjacent RUs in the thinned sublattice are at distance a*sqrt(3).
-    // Locations = centroids of equilateral triangles formed by 3 adjacent RUs.
-    const adjDist = a * sqrt3;
-    const tol = adjDist * 0.12;
-    const locMap = new Map();
-
-    // Build neighbor list
-    const neighbors = rus.map(() => []);
-    for (let i = 0; i < rus.length; i++) {
-        for (let j = i + 1; j < rus.length; j++) {
-            const d = Math.hypot(rus[i].x - rus[j].x, rus[i].y - rus[j].y);
-            if (Math.abs(d - adjDist) < tol) {
-                neighbors[i].push(j);
-                neighbors[j].push(i);
-            }
-        }
-    }
-
-    const locations = [];
-    for (let i = 0; i < rus.length; i++) {
-        for (let ni = 0; ni < neighbors[i].length; ni++) {
-            const j = neighbors[i][ni];
-            if (j <= i) continue;
-            for (let nj = 0; nj < neighbors[j].length; nj++) {
-                const k = neighbors[j][nj];
-                if (k <= j) continue;
-                if (!neighbors[i].includes(k)) continue;
-                const cx = (rus[i].x + rus[j].x + rus[k].x) / 3;
-                const cy = (rus[i].y + rus[j].y + rus[k].y) / 3;
-                const key = Math.round(cx * 10) + ',' + Math.round(cy * 10);
-                if (!locMap.has(key)) {
-                    locMap.set(key, true);
-                    locations.push({ x: cx, y: cy, ruIndices: [i, j, k] });
-                }
-            }
-        }
-    }
-
-    return { hexCenters, rus, locations, a, adjDist, neighbors };
-}
-
-function dist(a, b) {
-    return Math.hypot(a.x - b.x, a.y - b.y);
-}
-
-// ═══════════════════════════════════════════════════════════════
-// Build network
-// ═══════════════════════════════════════════════════════════════
-
-let gridData = {};
-
-function getBoresights(vertex) {
-    const adjAngles = vertex.adjHexAngles || [];
-    let boresights;
-    if (adjAngles.length >= 3) {
-        boresights = adjAngles.slice(0, 3).map(a => a.angle);
-    } else if (adjAngles.length > 0) {
-        boresights = adjAngles.map(a => a.angle);
-        const base = boresights[0];
-        for (let i = boresights.length; i < 3; i++) {
-            boresights.push(base + (2 * Math.PI / 3) * i);
-        }
-    } else {
-        boresights = [0, 2 * Math.PI / 3, 4 * Math.PI / 3];
-    }
-    return boresights;
-}
-
-function computeSectorRUs() {
-    sectorRUs = [];
-    const is120 = mode === 120 || mode === 'both';
-    const is60  = mode === 60  || mode === 'both';
-
-    vertexPositions.forEach((vtx, vi) => {
-        const boresights = getBoresights(vtx);
-
-        if (is120 && !is60) {
-            boresights.forEach((b, si) => {
-                sectorRUs.push({
-                    vtxIdx: vi, x: vtx.x, y: vtx.y,
-                    boresight: b,
-                    startAngle: b - Math.PI / 3,
-                    endAngle: b + Math.PI / 3,
-                    sectorWidth: 120, midAngle: b,
-                    colorIdx120: si,
-                    ruIdx: sectorRUs.length, layer: '120'
-                });
-            });
-        }
-
-        if (is60 && !is120) {
-            boresights.forEach((b, si) => {
-                for (let half = 0; half < 2; half++) {
-                    const start = b - Math.PI / 3 + half * Math.PI / 3 + Math.PI / 6;
-                    const end = start + Math.PI / 3;
-                    const mid = start + Math.PI / 6;
-                    sectorRUs.push({
-                        vtxIdx: vi, x: vtx.x, y: vtx.y,
-                        boresight: b,
-                        startAngle: start, endAngle: end,
-                        sectorWidth: 60, midAngle: mid,
-                        colorIdx60: si * 2 + half,
-                        ruIdx: sectorRUs.length, layer: '60'
-                    });
-                }
-            });
-        }
-
-        if (is120 && is60) {
-            boresights.forEach((b, si) => {
-                sectorRUs.push({
-                    vtxIdx: vi, x: vtx.x, y: vtx.y,
-                    boresight: b,
-                    startAngle: b - Math.PI / 3,
-                    endAngle: b + Math.PI / 3,
-                    sectorWidth: 120, midAngle: b,
-                    colorIdx120: si,
-                    ruIdx: sectorRUs.length, layer: '120'
-                });
-            });
-            boresights.forEach((b, si) => {
-                for (let half = 0; half < 2; half++) {
-                    const start = b - Math.PI / 3 + half * Math.PI / 3 + Math.PI / 6;
-                    const end = start + Math.PI / 3;
-                    const mid = start + Math.PI / 6;
-                    sectorRUs.push({
-                        vtxIdx: vi, x: vtx.x, y: vtx.y,
-                        boresight: b,
-                        startAngle: start, endAngle: end,
-                        sectorWidth: 60, midAngle: mid,
-                        colorIdx60: si * 2 + half,
-                        ruIdx: sectorRUs.length, layer: '60'
-                    });
-                }
-            });
-        }
-    });
-}
-
-function refreshDropdownAndStats() {
-    // Populate RU selector
-    const sel = document.getElementById('selectRU');
-    const prevVal = sel.value;
-    sel.innerHTML = '<option value="-1">None (show all)</option>';
-    sectorRUs.forEach((ru, i) => {
-        const opt = document.createElement('option');
-        opt.value = i;
-        opt.textContent = `RU ${i}`;
-        sel.appendChild(opt);
-    });
-    if (parseInt(prevVal) < sectorRUs.length) sel.value = prevVal;
-    else sel.value = '-1';
-
-    // Stats
-    document.getElementById('statRUs').textContent = sectorRUs.length;
-    document.getElementById('statSectors').textContent = vertexPositions.length;
-    document.getElementById('statLocations').textContent = locationPositions.length;
-    document.getElementById('statAngle').textContent =
-        mode === 60 ? '60°' : mode === 120 ? '120°' : mode === 'both' ? '120°/60°' : '—';
-}
-
-function buildNetwork() {
-    const rings = parseInt(document.getElementById('sliderRings').value);
-    const triSide = parseInt(document.getElementById('sliderISD').value);
-
-    gridData = generateNetwork(rings, triSide);
-    vertexPositions = gridData.rus;
-    hexCenters = gridData.hexCenters;
-    locationPositions = gridData.locations;
-
-    computeSectorRUs();
-    refreshDropdownAndStats();
-}
-
-// ═══════════════════════════════════════════════════════════════
-// Mode switching
-// ═══════════════════════════════════════════════════════════════
-
-function setMode(m) {
-    mode = m;
-    document.getElementById('btn120').classList.toggle('active', m === 120);
-    document.getElementById('btn60').classList.toggle('active', m === 60);
-    document.getElementById('btnBoth').classList.toggle('active', m === 'both');
-    document.getElementById('btnNone').classList.toggle('active', m === 'none');
-
-    computeSectorRUs();
-    refreshDropdownAndStats();
-    draw();
-}
-
-function updateConfig() {
-    document.getElementById('valISD').textContent = document.getElementById('sliderISD').value + ' m';
-    document.getElementById('valCircleR').textContent = document.getElementById('sliderCircleR').value + ' px';
-    document.getElementById('valRadius').textContent = document.getElementById('sliderRadius').value + '%';
-    document.getElementById('valOpacity').textContent = document.getElementById('sliderOpacity').value + '%';
-
-    const prevCount = sectorRUs.length;
-    buildNetwork();
-
-    document.getElementById('valRUs').textContent = sectorRUs.length;
-
-    if (sectorRUs.length !== prevCount) {
-        autoFitZoom();
-    }
-
-    draw();
-}
-
-// ═══════════════════════════════════════════════════════════════
-// Drawing
-// ═══════════════════════════════════════════════════════════════
-
-function toScreen(x, y) {
-    return {
-        x: (x + panX) * zoom + W / 2,
-        y: (y + panY) * zoom + H / 2
-    };
-}
-
-function draw() {
-    ctx.clearRect(0, 0, W, H);
-
-    // Background
-    ctx.save();
-    ctx.fillStyle = '#fafbfd';
-    ctx.fillRect(0, 0, W, H);
-
-    // Subtle dot grid
-    const gridStep = 20 * zoom;
-    if (gridStep > 5) {
-        ctx.fillStyle = '#e4e8ee';
-        const offX = ((panX * zoom + W / 2) % gridStep + gridStep) % gridStep;
-        const offY = ((panY * zoom + H / 2) % gridStep + gridStep) % gridStep;
-        for (let gx = offX; gx < W; gx += gridStep) {
-            for (let gy = offY; gy < H; gy += gridStep) {
-                ctx.beginPath();
-                ctx.arc(gx, gy, 1, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-    }
-    ctx.restore();
-
-    const a = gridData.a || 100;
-    const radiusFrac = parseInt(document.getElementById('sliderRadius').value) / 100;
-    const opacity = parseInt(document.getElementById('sliderOpacity').value) / 100;
-    const showHex = document.getElementById('chkHexGrid').checked;
-    const showTri = document.getElementById('chkTriGrid').checked;
-    const showSectorLines = document.getElementById('chkSectorLines').checked;
-    const showRULabels = document.getElementById('chkRULabels').checked;
-    const showSectorLabels = document.getElementById('chkSectorLabels').checked;
-    const showLocCenters = document.getElementById('chkLocationCenters').checked;
-    const showLocLabels = document.getElementById('chkLocationLabels').checked;
-    const highlightRU = parseInt(document.getElementById('selectRU').value);
-
-    // Sector visual radius: up to the hex center distance from vertex
-    // hex center is at distance a * sqrt(3)/3 ≈ 0.577*a from each of its vertices?
-    // No: for flat-top hex with side a, center-to-vertex = a.
-    // So the max meaningful sector radius = a (reaches the hex center).
-    const sectorVisualRadius = a * radiusFrac;
-
-    // ─── Draw hexagonal cells (thick black) ───
-    if (showHex) {
-        ctx.save();
-        ctx.strokeStyle = '#1a1a1a';
-        ctx.lineWidth = Math.max(2, 3 * zoom);
-        ctx.lineJoin = 'round';
-
-        hexCenters.forEach(c => {
-            ctx.beginPath();
+     
+        // ── All hex vertices, tagged with k-parity for sublattice ──
+        const vertexMap = new Map();
+        const precision = 100;
+     
+        hexCenters.forEach((c, ci) => {
             for (let k = 0; k < 6; k++) {
                 const angle = (Math.PI / 3) * k;
                 const vx = c.x + a * Math.cos(angle);
                 const vy = c.y + a * Math.sin(angle);
-                const sp = toScreen(vx, vy);
-                if (k === 0) ctx.moveTo(sp.x, sp.y);
-                else ctx.lineTo(sp.x, sp.y);
+                const key = Math.round(vx * precision) + ',' + Math.round(vy * precision);
+                if (!vertexMap.has(key)) {
+                    vertexMap.set(key, { x: vx, y: vy, adjHexIndices: [ci], kParity: k % 2 });
+                } else {
+                    vertexMap.get(key).adjHexIndices.push(ci);
+                    // k-parity is globally consistent, but just in case keep first
+                }
             }
-            ctx.closePath();
-            ctx.stroke();
         });
-        ctx.restore();
-    }
-
-    // ─── Sector labels at hex cell centers ───
-    if (showSectorLabels) {
-        const secLabelOp = parseInt(document.getElementById('sliderSectorLabelOp').value) / 100;
-        const secLabelSize = parseInt(document.getElementById('sliderSectorLabelSize').value);
-        document.getElementById('valSectorLabelOp').textContent = Math.round(secLabelOp * 100) + '%';
-        document.getElementById('valSectorLabelSize').textContent = secLabelSize + ' px';
-
-        hexCenters.forEach((c, idx) => {
-            const sp = toScreen(c.x, c.y);
-            const fontSize = Math.max(8, secLabelSize * zoom);
-            ctx.save();
-            ctx.font = `700 ${fontSize}px 'Source Sans Pro', serif`;
-            ctx.fillStyle = `rgba(30,30,30,${secLabelOp})`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(`Sector ${idx}`, sp.x, sp.y);
-            ctx.restore();
+     
+        // ── Keep only ONE sublattice (even-k vertices = 0°,120°,240°) ──
+        const rus = [];
+        vertexMap.forEach(v => {
+            if (v.kParity === 0) { // keep alternating vertices
+                v.idx = rus.length;
+                rus.push(v);
+            }
         });
-    }
-
-    // ─── Draw triangular grid (edges between adjacent vertices) ───
-    if (showTri) {
-        ctx.save();
-        ctx.strokeStyle = 'rgba(0,60,180,0.7)';
-        ctx.lineWidth = Math.max(1.5, 2.5 * zoom);
-
-        const adjDist = gridData.adjDist || a * Math.sqrt(3);
+     
+        // ── Build adjacency to hex centers, sorted by angle ──
+        rus.forEach(ru => {
+            ru.adjHexAngles = ru.adjHexIndices
+                .map(hi => ({
+                    hi,
+                    angle: Math.atan2(hexCenters[hi].y - ru.y, hexCenters[hi].x - ru.x)
+                }))
+                .sort((a, b) => a.angle - b.angle);
+        });
+     
+        // ── Location centers ──
+        // Adjacent RUs in the thinned sublattice are at distance a*sqrt(3).
+        // Locations = centroids of equilateral triangles formed by 3 adjacent RUs.
+        const adjDist = a * sqrt3;
         const tol = adjDist * 0.12;
-        for (let i = 0; i < vertexPositions.length; i++) {
-            for (let j = i + 1; j < vertexPositions.length; j++) {
-                const d = dist(vertexPositions[i], vertexPositions[j]);
+        const locMap = new Map();
+     
+        // Build neighbor list
+        const neighbors = rus.map(() => []);
+        for (let i = 0; i < rus.length; i++) {
+            for (let j = i + 1; j < rus.length; j++) {
+                const d = Math.hypot(rus[i].x - rus[j].x, rus[i].y - rus[j].y);
                 if (Math.abs(d - adjDist) < tol) {
-                    const p1 = toScreen(vertexPositions[i].x, vertexPositions[i].y);
-                    const p2 = toScreen(vertexPositions[j].x, vertexPositions[j].y);
+                    neighbors[i].push(j);
+                    neighbors[j].push(i);
+                }
+            }
+        }
+     
+        const locations = [];
+        for (let i = 0; i < rus.length; i++) {
+            for (let ni = 0; ni < neighbors[i].length; ni++) {
+                const j = neighbors[i][ni];
+                if (j <= i) continue;
+                for (let nj = 0; nj < neighbors[j].length; nj++) {
+                    const k = neighbors[j][nj];
+                    if (k <= j) continue;
+                    if (!neighbors[i].includes(k)) continue;
+                    const cx = (rus[i].x + rus[j].x + rus[k].x) / 3;
+                    const cy = (rus[i].y + rus[j].y + rus[k].y) / 3;
+                    const key = Math.round(cx * 10) + ',' + Math.round(cy * 10);
+                    if (!locMap.has(key)) {
+                        locMap.set(key, true);
+                        locations.push({ x: cx, y: cy, ruIndices: [i, j, k] });
+                    }
+                }
+            }
+        }
+     
+        return { hexCenters, rus, locations, a, adjDist, neighbors };
+    }
+     
+    function dist(a, b) {
+        return Math.hypot(a.x - b.x, a.y - b.y);
+    }
+     
+    // ═══════════════════════════════════════════════════════════════
+    // Build network
+    // ═══════════════════════════════════════════════════════════════
+     
+    let gridData = {};
+     
+    function getBoresightObjects(vertex) {
+        // Returns array of {angle, hexIdx} — hexIdx is -1 for fake (boundary) boresights
+        const adjAngles = vertex.adjHexAngles || [];
+        let boresights = [];
+        if (adjAngles.length >= 3) {
+            boresights = adjAngles.slice(0, 3).map(a => ({ angle: a.angle, hexIdx: a.hi }));
+        } else if (adjAngles.length > 0) {
+            boresights = adjAngles.map(a => ({ angle: a.angle, hexIdx: a.hi }));
+            const base = boresights[0].angle;
+            for (let i = boresights.length; i < 3; i++) {
+                boresights.push({ angle: base + (2 * Math.PI / 3) * i, hexIdx: -1 });
+            }
+        } else {
+            for (let i = 0; i < 3; i++) {
+                boresights.push({ angle: (2 * Math.PI / 3) * i, hexIdx: -1 });
+            }
+        }
+        return boresights;
+    }
+     
+    // ── Robust geometric containment for highlight mapping ──
+     
+    function pointInPolygon(px, py, polygon) {
+        // Ray-casting algorithm
+        let inside = false;
+        for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+            const xi = polygon[i].x, yi = polygon[i].y;
+            const xj = polygon[j].x, yj = polygon[j].y;
+            if ((yi > py) !== (yj > py) &&
+                px < (xj - xi) * (py - yi) / (yj - yi) + xi) {
+                inside = !inside;
+            }
+        }
+        return inside;
+    }
+     
+    function getHexPolygon(hexIdx) {
+        const c = hexCenters[hexIdx];
+        const a = gridData.a;
+        const poly = [];
+        for (let k = 0; k < 6; k++) {
+            const angle = (Math.PI / 3) * k;
+            poly.push({ x: c.x + a * Math.cos(angle), y: c.y + a * Math.sin(angle) });
+        }
+        return poly;
+    }
+     
+    function getLocTriangle(locIdx) {
+        const loc = locationPositions[locIdx];
+        if (!loc.ruIndices || loc.ruIndices.length < 3) return null;
+        return loc.ruIndices.map(vi => ({
+            x: vertexPositions[vi].x,
+            y: vertexPositions[vi].y
+        }));
+    }
+     
+    // For a sector-RU, find which hex contains the probe point
+    // (point slightly offset from vertex along midAngle)
+    function findContainingHex(vtx, midAngle) {
+        const a = gridData.a;
+        const probeDist = a * 0.4; // probe into the sector
+        const px = vtx.x + probeDist * Math.cos(midAngle);
+        const py = vtx.y + probeDist * Math.sin(midAngle);
+     
+        // Only check hexes adjacent to this vertex
+        for (const hi of (vtx.adjHexIndices || [])) {
+            const poly = getHexPolygon(hi);
+            if (pointInPolygon(px, py, poly)) return hi;
+        }
+        return -1;
+    }
+     
+    function findContainingLocations(vtx, vtxIdx, midAngle) {
+        const a = gridData.a;
+        const probeDist = a * 0.35;
+        const px = vtx.x + probeDist * Math.cos(midAngle);
+        const py = vtx.y + probeDist * Math.sin(midAngle);
+     
+        const results = [];
+        locationPositions.forEach((loc, li) => {
+            if (!loc.ruIndices || !loc.ruIndices.includes(vtxIdx)) return;
+            const tri = getLocTriangle(li);
+            if (tri && pointInPolygon(px, py, tri)) {
+                results.push(li);
+            }
+        });
+        return results;
+    }
+     
+    function computeSectorRUs() {
+        sectorRUs = [];
+        const is120 = mode === 120 || mode === 'both';
+        const is60  = mode === 60  || mode === 'both';
+     
+        vertexPositions.forEach((vtx, vi) => {
+            const boresightObjs = getBoresightObjects(vtx);
+     
+            if (is120 && !is60) {
+                boresightObjs.forEach((bo, si) => {
+                    const sa = bo.angle - Math.PI / 3;
+                    const ea = bo.angle + Math.PI / 3;
+                    sectorRUs.push({
+                        vtxIdx: vi, x: vtx.x, y: vtx.y,
+                        boresight: bo.angle, startAngle: sa, endAngle: ea,
+                        sectorWidth: 120, midAngle: bo.angle,
+                        colorIdx120: si,
+                        facingHexIdx: findContainingHex(vtx, bo.angle),
+                        facingLocIndices: findContainingLocations(vtx, vi, bo.angle),
+                        ruIdx: sectorRUs.length, layer: '120'
+                    });
+                });
+            }
+     
+            if (is60 && !is120) {
+                boresightObjs.forEach((bo, si) => {
+                    for (let half = 0; half < 2; half++) {
+                        const start = bo.angle - Math.PI / 3 + half * Math.PI / 3 + Math.PI / 6;
+                        const end = start + Math.PI / 3;
+                        const mid = start + Math.PI / 6;
+                        sectorRUs.push({
+                            vtxIdx: vi, x: vtx.x, y: vtx.y,
+                            boresight: bo.angle, startAngle: start, endAngle: end,
+                            sectorWidth: 60, midAngle: mid,
+                            colorIdx60: si * 2 + half,
+                            facingHexIdx: findContainingHex(vtx, mid),
+                            facingLocIndices: findContainingLocations(vtx, vi, mid),
+                            ruIdx: sectorRUs.length, layer: '60'
+                        });
+                    }
+                });
+            }
+     
+            if (is120 && is60) {
+                boresightObjs.forEach((bo, si) => {
+                    const sa = bo.angle - Math.PI / 3;
+                    const ea = bo.angle + Math.PI / 3;
+                    sectorRUs.push({
+                        vtxIdx: vi, x: vtx.x, y: vtx.y,
+                        boresight: bo.angle, startAngle: sa, endAngle: ea,
+                        sectorWidth: 120, midAngle: bo.angle,
+                        colorIdx120: si,
+                        facingHexIdx: findContainingHex(vtx, bo.angle),
+                        facingLocIndices: findContainingLocations(vtx, vi, bo.angle),
+                        ruIdx: sectorRUs.length, layer: '120'
+                    });
+                });
+                boresightObjs.forEach((bo, si) => {
+                    for (let half = 0; half < 2; half++) {
+                        const start = bo.angle - Math.PI / 3 + half * Math.PI / 3 + Math.PI / 6;
+                        const end = start + Math.PI / 3;
+                        const mid = start + Math.PI / 6;
+                        sectorRUs.push({
+                            vtxIdx: vi, x: vtx.x, y: vtx.y,
+                            boresight: bo.angle, startAngle: start, endAngle: end,
+                            sectorWidth: 60, midAngle: mid,
+                            colorIdx60: si * 2 + half,
+                            facingHexIdx: findContainingHex(vtx, mid),
+                            facingLocIndices: findContainingLocations(vtx, vi, mid),
+                            ruIdx: sectorRUs.length, layer: '60'
+                        });
+                    }
+                });
+            }
+        });
+    }
+     
+    // Maps: which RUs belong to each sector (hex) and each location (triangle)
+    let sectorToRUs = {}; // hexIdx -> [ruIdx, ...]
+    let locationToRUs = {}; // locIdx -> [ruIdx, ...]
+     
+     
+    function buildHighlightMaps() {
+        sectorToRUs = {};
+        locationToRUs = {};
+     
+        hexCenters.forEach((_, hi) => { sectorToRUs[hi] = []; });
+        locationPositions.forEach((_, li) => { locationToRUs[li] = []; });
+     
+        sectorRUs.forEach((ru, ri) => {
+            // Use pre-computed mappings from computeSectorRUs
+            if (ru.facingHexIdx >= 0 && sectorToRUs[ru.facingHexIdx]) {
+                sectorToRUs[ru.facingHexIdx].push(ri);
+            }
+            (ru.facingLocIndices || []).forEach(li => {
+                if (locationToRUs[li] && !locationToRUs[li].includes(ri)) {
+                    locationToRUs[li].push(ri);
+                }
+            });
+        });
+    }
+     
+    function refreshDropdownAndStats() {
+        // Populate RU selector
+        const sel = document.getElementById('selectRU');
+        const prevVal = sel.value;
+        sel.innerHTML = '<option value="-1">None</option>';
+        sectorRUs.forEach((ru, i) => {
+            const opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = `RU ${i}`;
+            sel.appendChild(opt);
+        });
+        if (parseInt(prevVal) < sectorRUs.length) sel.value = prevVal;
+        else sel.value = '-1';
+     
+        // Populate Sector selector
+        const selS = document.getElementById('selectSector');
+        const prevS = selS.value;
+        selS.innerHTML = '<option value="-1">None</option>';
+        hexCenters.forEach((_, i) => {
+            const opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = `Sector ${i}`;
+            selS.appendChild(opt);
+        });
+        if (parseInt(prevS) < hexCenters.length) selS.value = prevS;
+        else selS.value = '-1';
+     
+        // Populate Location selector
+        const selL = document.getElementById('selectLocation');
+        const prevL = selL.value;
+        selL.innerHTML = '<option value="-1">None</option>';
+        locationPositions.forEach((_, i) => {
+            const opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = `Location ${i}`;
+            selL.appendChild(opt);
+        });
+        if (parseInt(prevL) < locationPositions.length) selL.value = prevL;
+        else selL.value = '-1';
+     
+        // Stats
+        document.getElementById('statRUs').textContent = sectorRUs.length;
+        document.getElementById('statSectors').textContent = hexCenters.length;
+        document.getElementById('statLocations').textContent = locationPositions.length;
+        document.getElementById('statAngle').textContent =
+            mode === 60 ? '60°' : mode === 120 ? '120°' : mode === 'both' ? '120°/60°' : '—';
+    }
+     
+    function buildNetwork() {
+        const rings = parseInt(document.getElementById('sliderRings').value);
+        const triSide = parseInt(document.getElementById('sliderISD').value);
+     
+        gridData = generateNetwork(rings, triSide);
+        vertexPositions = gridData.rus;
+        hexCenters = gridData.hexCenters;
+        locationPositions = gridData.locations;
+     
+        computeSectorRUs();
+        buildHighlightMaps();
+        refreshDropdownAndStats();
+    }
+     
+    // ═══════════════════════════════════════════════════════════════
+    // Mode switching
+    // ═══════════════════════════════════════════════════════════════
+     
+    function setMode(m) {
+        mode = m;
+        document.getElementById('btn120').classList.toggle('active', m === 120);
+        document.getElementById('btn60').classList.toggle('active', m === 60);
+        document.getElementById('btnBoth').classList.toggle('active', m === 'both');
+        document.getElementById('btnNone').classList.toggle('active', m === 'none');
+     
+        computeSectorRUs();
+        buildHighlightMaps();
+        refreshDropdownAndStats();
+        draw();
+    }
+     
+    function updateConfig() {
+        document.getElementById('valISD').textContent = document.getElementById('sliderISD').value + ' m';
+        document.getElementById('valCircleR').textContent = document.getElementById('sliderCircleR').value + ' px';
+        document.getElementById('valRadius').textContent = document.getElementById('sliderRadius').value + '%';
+        document.getElementById('valOpacity').textContent = document.getElementById('sliderOpacity').value + '%';
+     
+        const prevCount = sectorRUs.length;
+        buildNetwork();
+     
+        document.getElementById('valRUs').textContent = sectorRUs.length;
+     
+        if (sectorRUs.length !== prevCount) {
+            autoFitZoom();
+        }
+     
+        draw();
+    }
+     
+    // ═══════════════════════════════════════════════════════════════
+    // Drawing
+    // ═══════════════════════════════════════════════════════════════
+     
+    function toScreen(x, y) {
+        return {
+            x: (x + panX) * zoom + W / 2,
+            y: (y + panY) * zoom + H / 2
+        };
+    }
+     
+    function draw() {
+        ctx.clearRect(0, 0, W, H);
+     
+        // Background
+        ctx.save();
+        ctx.fillStyle = '#fafbfd';
+        ctx.fillRect(0, 0, W, H);
+     
+        // Subtle dot grid
+        const gridStep = 20 * zoom;
+        if (gridStep > 5) {
+            ctx.fillStyle = '#e4e8ee';
+            const offX = ((panX * zoom + W / 2) % gridStep + gridStep) % gridStep;
+            const offY = ((panY * zoom + H / 2) % gridStep + gridStep) % gridStep;
+            for (let gx = offX; gx < W; gx += gridStep) {
+                for (let gy = offY; gy < H; gy += gridStep) {
                     ctx.beginPath();
-                    ctx.moveTo(p1.x, p1.y);
-                    ctx.lineTo(p2.x, p2.y);
-                    ctx.stroke();
+                    ctx.arc(gx, gy, 1, 0, Math.PI * 2);
+                    ctx.fill();
                 }
             }
         }
         ctx.restore();
-    }
-
-    // ─── Draw sectors and RU labels ───
-    const circleBaseR = parseInt(document.getElementById('sliderCircleR').value);
-    const ruLabelBase = parseInt(document.getElementById('sliderRULabelSize').value);
-    const locLabelBase = parseInt(document.getElementById('sliderLocLabelSize').value);
-    const locTriBase = parseInt(document.getElementById('sliderLocTriSize').value);
-
-    // Update slider value displays
-    document.getElementById('valRULabelSize').textContent = ruLabelBase + ' px';
-    document.getElementById('valLocLabelSize').textContent = locLabelBase + ' px';
-    document.getElementById('valLocTriSize').textContent = locTriBase + ' px';
-
-    sectorRUs.forEach((ru, idx) => {
-        if (highlightRU >= 0 && highlightRU !== idx) return;
-
-        const sectorRadius = (ru.layer === '60' && mode === 'both')
-            ? sectorVisualRadius * 0.65
-            : sectorVisualRadius;
-
-        // Sector color
-        let col;
-        if (ru.layer === '120') {
-            col = sector120Colors[ru.colorIdx120 % 3];
-        } else {
-            col = sector60Colors[ru.colorIdx60 % 6];
+     
+        const a = gridData.a || 100;
+        const radiusFrac = parseInt(document.getElementById('sliderRadius').value) / 100;
+        const opacity = parseInt(document.getElementById('sliderOpacity').value) / 100;
+        const showHex = document.getElementById('chkHexGrid').checked;
+        const showTri = document.getElementById('chkTriGrid').checked;
+        const showSectorLines = document.getElementById('chkSectorLines').checked;
+        const showRULabels = document.getElementById('chkRULabels').checked;
+        const showSectorLabels = document.getElementById('chkSectorLabels').checked;
+        const showLocCenters = document.getElementById('chkLocationCenters').checked;
+        const showLocLabels = document.getElementById('chkLocationLabels').checked;
+        const highlightRU = parseInt(document.getElementById('selectRU').value);
+        const highlightSector = parseInt(document.getElementById('selectSector').value);
+        const highlightLoc = parseInt(document.getElementById('selectLocation').value);
+        const showSectorFill = document.getElementById('chkSectorFill').checked;
+        const sectorFillOp = parseInt(document.getElementById('sliderSectorFillOp').value) / 100;
+        const showLocFill = document.getElementById('chkLocFill').checked;
+        const locFillOp = parseInt(document.getElementById('sliderLocFillOp').value) / 100;
+     
+        document.getElementById('valSectorFillOp').textContent = Math.round(sectorFillOp * 100) + '%';
+        document.getElementById('valLocFillOp').textContent = Math.round(locFillOp * 100) + '%';
+     
+        // ── Build set of "active" RU indices based on all highlights ──
+        const anyHighlight = highlightRU >= 0 || highlightSector >= 0 || highlightLoc >= 0;
+        let activeRUs = null; // null = all active
+        if (anyHighlight) {
+            activeRUs = new Set();
+            if (highlightRU >= 0) activeRUs.add(highlightRU);
+            if (highlightSector >= 0 && sectorToRUs[highlightSector]) {
+                sectorToRUs[highlightSector].forEach(ri => activeRUs.add(ri));
+            }
+            if (highlightLoc >= 0 && locationToRUs[highlightLoc]) {
+                locationToRUs[highlightLoc].forEach(ri => activeRUs.add(ri));
+            }
         }
-        const opMult = ru.layer === '60' ? 0.6 : 1;
-        const fillColor = `hsla(${col.h},${col.s}%,${col.l}%,${opacity * opMult})`;
-        const strokeColor = `hsla(${col.h},${col.s}%,${col.l}%,${Math.min(1, opacity * 2.5)})`;
-
-        // Draw sector wedge
-        drawSector(ru, sectorRadius, ru.startAngle, ru.endAngle, fillColor, strokeColor, showSectorLines);
-
-        // RU label — positioned inside the sector
-        if (showRULabels) {
-            const labelOffset = sectorRadius * 0.45;
-            const lx = ru.x + labelOffset * Math.cos(ru.midAngle);
-            const ly = ru.y + labelOffset * Math.sin(ru.midAngle);
-            const sp = toScreen(lx, ly);
-            const fontSize = Math.max(6, ruLabelBase * zoom);
-            const ruStroke = `hsla(${col.h},${col.s}%,${Math.max(col.l - 15, 10)}%,1)`;
-
-            ctx.save();
-            ctx.font = `700 ${fontSize}px 'JetBrains Mono', monospace`;
-            ctx.fillStyle = ruStroke;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(`RU${idx}`, sp.x, sp.y);
-            ctx.restore();
-        }
-    });
-
-    // ─── Draw one circle per vertex ───
-    vertexPositions.forEach((vtx, vi) => {
-        const sp = toScreen(vtx.x, vtx.y);
-        const r = Math.max(3, circleBaseR * zoom);
-
-        // Check if any sector at this vertex is highlighted
-        const vtxRUs = sectorRUs.filter(ru => ru.vtxIdx === vi);
-        const anyHL = highlightRU >= 0 && vtxRUs.some(ru => ru.ruIdx === highlightRU);
-        const allDimmed = highlightRU >= 0 && !anyHL;
-
-        ctx.save();
-
-        if (anyHL) {
-            ctx.beginPath();
-            ctx.arc(sp.x, sp.y, r * 2, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(0,82,204,0.12)';
-            ctx.fill();
-        }
-
-        ctx.beginPath();
-        ctx.arc(sp.x, sp.y, r, 0, Math.PI * 2);
-        ctx.fillStyle = allDimmed ? '#aab' : '#0052cc';
-        ctx.fill();
-        ctx.strokeStyle = allDimmed ? '#889' : '#003380';
-        ctx.lineWidth = Math.max(1.5, 2 * zoom);
-        ctx.stroke();
-
-        // Inner dot
-        ctx.beginPath();
-        ctx.arc(sp.x, sp.y, r * 0.3, 0, Math.PI * 2);
-        ctx.fillStyle = 'white';
-        ctx.fill();
-
-        ctx.restore();
-    });
-
-    // ─── Draw location centers ───
-    if (showLocCenters) {
-        locationPositions.forEach((loc, idx) => {
-            const sp = toScreen(loc.x, loc.y);
-            const r = Math.max(3, locTriBase * zoom);
-            const color = locationColors[idx % locationColors.length];
-
-            ctx.save();
-            ctx.beginPath();
-            ctx.moveTo(sp.x, sp.y - r * 1.3);
-            ctx.lineTo(sp.x - r * 1.1, sp.y + r * 0.8);
-            ctx.lineTo(sp.x + r * 1.1, sp.y + r * 0.8);
-            ctx.closePath();
-            ctx.fillStyle = color;
-            ctx.fill();
-            ctx.strokeStyle = 'white';
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
-            ctx.restore();
-
-            if (showLocLabels) {
-                const fontSize = Math.max(6, locLabelBase * zoom);
+     
+        const sectorVisualRadius = a * radiusFrac;
+     
+        // Color palette for hex fills (same indices as sector120Colors, cycled)
+        const hexFillColors = [
+            'hsla(210,85%,60%,', 'hsla(140,60%,50%,', 'hsla(30,80%,60%,',
+            'hsla(280,55%,55%,', 'hsla(350,70%,55%,', 'hsla(180,60%,45%,',
+            'hsla(50,80%,55%,',  'hsla(100,55%,45%,', 'hsla(320,60%,55%,',
+        ];
+     
+        // ─── Filled sector (hex) backgrounds ───
+        if (showSectorFill || highlightSector >= 0) {
+            hexCenters.forEach((c, hi) => {
+                const isHL = highlightSector === hi;
+                const fillOp = isHL ? Math.max(sectorFillOp, 0.25) : sectorFillOp;
+                if (!showSectorFill && !isHL) return;
+     
                 ctx.save();
-                ctx.font = `600 ${fontSize}px 'Source Sans Pro', sans-serif`;
+                ctx.beginPath();
+                for (let k = 0; k < 6; k++) {
+                    const angle = (Math.PI / 3) * k;
+                    const vx = c.x + a * Math.cos(angle);
+                    const vy = c.y + a * Math.sin(angle);
+                    const sp = toScreen(vx, vy);
+                    if (k === 0) ctx.moveTo(sp.x, sp.y);
+                    else ctx.lineTo(sp.x, sp.y);
+                }
+                ctx.closePath();
+                const colStr = hexFillColors[hi % hexFillColors.length];
+                ctx.fillStyle = colStr + fillOp + ')';
+                if (isHL) {
+                    ctx.strokeStyle = colStr + '0.8)';
+                    ctx.lineWidth = Math.max(2, 3 * zoom);
+                    ctx.stroke();
+                }
+                ctx.fill();
+                ctx.restore();
+            });
+        }
+     
+        // ─── Filled location (triangle) backgrounds ───
+        if (showLocFill || highlightLoc >= 0) {
+            locationPositions.forEach((loc, li) => {
+                const isHL = highlightLoc === li;
+                const fillOp = isHL ? Math.max(locFillOp, 0.25) : locFillOp;
+                if (!showLocFill && !isHL) return;
+     
+                // Triangle vertices from the 3 RU positions
+                const vis = loc.ruIndices;
+                if (!vis || vis.length < 3) return;
+                const v0 = vertexPositions[vis[0]];
+                const v1 = vertexPositions[vis[1]];
+                const v2 = vertexPositions[vis[2]];
+                if (!v0 || !v1 || !v2) return;
+     
+                const p0 = toScreen(v0.x, v0.y);
+                const p1 = toScreen(v1.x, v1.y);
+                const p2 = toScreen(v2.x, v2.y);
+     
+                const color = locationColors[li % locationColors.length];
+     
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(p0.x, p0.y);
+                ctx.lineTo(p1.x, p1.y);
+                ctx.lineTo(p2.x, p2.y);
+                ctx.closePath();
+                ctx.globalAlpha = fillOp;
                 ctx.fillStyle = color;
+                ctx.fill();
+                ctx.globalAlpha = 1;
+                if (isHL) {
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = Math.max(2, 3 * zoom);
+                    ctx.globalAlpha = 0.8;
+                    ctx.stroke();
+                    ctx.globalAlpha = 1;
+                }
+                ctx.restore();
+            });
+        }
+     
+        // ─── Draw hexagonal cells (thick black) ───
+        if (showHex) {
+            ctx.save();
+            ctx.strokeStyle = '#1a1a1a';
+            ctx.lineWidth = Math.max(2, 3 * zoom);
+            ctx.lineJoin = 'round';
+     
+            hexCenters.forEach(c => {
+                ctx.beginPath();
+                for (let k = 0; k < 6; k++) {
+                    const angle = (Math.PI / 3) * k;
+                    const vx = c.x + a * Math.cos(angle);
+                    const vy = c.y + a * Math.sin(angle);
+                    const sp = toScreen(vx, vy);
+                    if (k === 0) ctx.moveTo(sp.x, sp.y);
+                    else ctx.lineTo(sp.x, sp.y);
+                }
+                ctx.closePath();
+                ctx.stroke();
+            });
+            ctx.restore();
+        }
+     
+        // ─── Sector labels at hex cell centers ───
+        if (showSectorLabels) {
+            const secLabelOp = parseInt(document.getElementById('sliderSectorLabelOp').value) / 100;
+            const secLabelSize = parseInt(document.getElementById('sliderSectorLabelSize').value);
+            document.getElementById('valSectorLabelOp').textContent = Math.round(secLabelOp * 100) + '%';
+            document.getElementById('valSectorLabelSize').textContent = secLabelSize + ' px';
+     
+            hexCenters.forEach((c, idx) => {
+                const sp = toScreen(c.x, c.y);
+                const fontSize = Math.max(8, secLabelSize * zoom);
+                ctx.save();
+                ctx.font = `700 ${fontSize}px 'Source Sans Pro', serif`;
+                ctx.fillStyle = `rgba(30,30,30,${secLabelOp})`;
                 ctx.textAlign = 'center';
-                ctx.textBaseline = 'top';
-                ctx.fillText(`Loc ${idx}`, sp.x, sp.y + r * 1.2 + 2);
+                ctx.textBaseline = 'middle';
+                ctx.fillText(`Sector ${idx}`, sp.x, sp.y);
+                ctx.restore();
+            });
+        }
+     
+        // ─── Draw triangular grid (edges between adjacent vertices) ───
+        if (showTri) {
+            ctx.save();
+            ctx.strokeStyle = 'rgba(0,60,180,0.7)';
+            ctx.lineWidth = Math.max(1.5, 2.5 * zoom);
+     
+            const adjDist = gridData.adjDist || a * Math.sqrt(3);
+            const tol = adjDist * 0.12;
+            for (let i = 0; i < vertexPositions.length; i++) {
+                for (let j = i + 1; j < vertexPositions.length; j++) {
+                    const d = dist(vertexPositions[i], vertexPositions[j]);
+                    if (Math.abs(d - adjDist) < tol) {
+                        const p1 = toScreen(vertexPositions[i].x, vertexPositions[i].y);
+                        const p2 = toScreen(vertexPositions[j].x, vertexPositions[j].y);
+                        ctx.beginPath();
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            ctx.restore();
+        }
+     
+        // ─── Draw sectors and RU labels ───
+        const circleBaseR = parseInt(document.getElementById('sliderCircleR').value);
+        const ruLabelBase = parseInt(document.getElementById('sliderRULabelSize').value);
+        const locLabelBase = parseInt(document.getElementById('sliderLocLabelSize').value);
+        const locTriBase = parseInt(document.getElementById('sliderLocTriSize').value);
+     
+        // Update slider value displays
+        document.getElementById('valRULabelSize').textContent = ruLabelBase + ' px';
+        document.getElementById('valLocLabelSize').textContent = locLabelBase + ' px';
+        document.getElementById('valLocTriSize').textContent = locTriBase + ' px';
+     
+        sectorRUs.forEach((ru, idx) => {
+            const isActive = !activeRUs || activeRUs.has(idx);
+            if (anyHighlight && !isActive) {
+                // Draw dimmed version
+                const sectorRadius = (ru.layer === '60' && mode === 'both')
+                    ? sectorVisualRadius * 0.65 : sectorVisualRadius;
+                const dimFill = `hsla(0,0%,70%,${opacity * 0.15})`;
+                const dimStroke = `hsla(0,0%,60%,${opacity * 0.3})`;
+                drawSector(ru, sectorRadius, ru.startAngle, ru.endAngle, dimFill, dimStroke, showSectorLines);
+                return;
+            }
+     
+            const sectorRadius = (ru.layer === '60' && mode === 'both')
+                ? sectorVisualRadius * 0.65
+                : sectorVisualRadius;
+     
+            // Sector color
+            let col;
+            if (ru.layer === '120') {
+                col = sector120Colors[ru.colorIdx120 % 3];
+            } else {
+                col = sector60Colors[ru.colorIdx60 % 6];
+            }
+            const opMult = ru.layer === '60' ? 0.6 : 1;
+            const fillColor = `hsla(${col.h},${col.s}%,${col.l}%,${opacity * opMult})`;
+            const strokeColor = `hsla(${col.h},${col.s}%,${col.l}%,${Math.min(1, opacity * 2.5)})`;
+     
+            // Draw sector wedge
+            drawSector(ru, sectorRadius, ru.startAngle, ru.endAngle, fillColor, strokeColor, showSectorLines);
+     
+            // RU label — positioned inside the sector
+            if (showRULabels) {
+                const labelOffset = sectorRadius * 0.45;
+                const lx = ru.x + labelOffset * Math.cos(ru.midAngle);
+                const ly = ru.y + labelOffset * Math.sin(ru.midAngle);
+                const sp = toScreen(lx, ly);
+                const fontSize = Math.max(6, ruLabelBase * zoom);
+                const ruStroke = `hsla(${col.h},${col.s}%,${Math.max(col.l - 15, 10)}%,1)`;
+     
+                ctx.save();
+                ctx.font = `700 ${fontSize}px 'JetBrains Mono', monospace`;
+                ctx.fillStyle = ruStroke;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(`RU${idx}`, sp.x, sp.y);
                 ctx.restore();
             }
         });
+     
+        // ─── Draw one circle per vertex ───
+        vertexPositions.forEach((vtx, vi) => {
+            const sp = toScreen(vtx.x, vtx.y);
+            const r = Math.max(3, circleBaseR * zoom);
+     
+            // Check if any sector at this vertex is active
+            const vtxRUs = sectorRUs.filter(ru => ru.vtxIdx === vi);
+            const anyActive = !activeRUs || vtxRUs.some(ru => activeRUs.has(ru.ruIdx));
+            const allDimmed = anyHighlight && !anyActive;
+     
+            ctx.save();
+     
+            if (anyHighlight && anyActive && !allDimmed) {
+                ctx.beginPath();
+                ctx.arc(sp.x, sp.y, r * 2, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(0,82,204,0.12)';
+                ctx.fill();
+            }
+     
+            ctx.beginPath();
+            ctx.arc(sp.x, sp.y, r, 0, Math.PI * 2);
+            ctx.fillStyle = allDimmed ? '#aab' : '#0052cc';
+            ctx.fill();
+            ctx.strokeStyle = allDimmed ? '#889' : '#003380';
+            ctx.lineWidth = Math.max(1.5, 2 * zoom);
+            ctx.stroke();
+     
+            // Inner dot
+            ctx.beginPath();
+            ctx.arc(sp.x, sp.y, r * 0.3, 0, Math.PI * 2);
+            ctx.fillStyle = 'white';
+            ctx.fill();
+     
+            ctx.restore();
+        });
+     
+        // ─── Draw location centers ───
+        if (showLocCenters) {
+            locationPositions.forEach((loc, idx) => {
+                const sp = toScreen(loc.x, loc.y);
+                const r = Math.max(3, locTriBase * zoom);
+                const color = locationColors[idx % locationColors.length];
+     
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(sp.x, sp.y - r * 1.3);
+                ctx.lineTo(sp.x - r * 1.1, sp.y + r * 0.8);
+                ctx.lineTo(sp.x + r * 1.1, sp.y + r * 0.8);
+                ctx.closePath();
+                ctx.fillStyle = color;
+                ctx.fill();
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+                ctx.restore();
+     
+                if (showLocLabels) {
+                    const fontSize = Math.max(6, locLabelBase * zoom);
+                    ctx.save();
+                    ctx.font = `600 ${fontSize}px 'Source Sans Pro', sans-serif`;
+                    ctx.fillStyle = color;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'top';
+                    ctx.fillText(`Loc ${idx}`, sp.x, sp.y + r * 1.2 + 2);
+                    ctx.restore();
+                }
+            });
+        }
     }
-}
-
-function drawSector(center, radius, startAngle, endAngle, fillColor, strokeColor, showLines) {
-    const cp = toScreen(center.x, center.y);
-    const r = radius * zoom;
-
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(cp.x, cp.y);
-    ctx.arc(cp.x, cp.y, r, startAngle, endAngle);
-    ctx.closePath();
-    ctx.fillStyle = fillColor;
-    ctx.fill();
-
-    if (showLines) {
-        ctx.strokeStyle = strokeColor;
-        ctx.lineWidth = Math.max(1, 1.5 * zoom);
-        ctx.stroke();
+     
+    function drawSector(center, radius, startAngle, endAngle, fillColor, strokeColor, showLines) {
+        const cp = toScreen(center.x, center.y);
+        const r = radius * zoom;
+     
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(cp.x, cp.y);
+        ctx.arc(cp.x, cp.y, r, startAngle, endAngle);
+        ctx.closePath();
+        ctx.fillStyle = fillColor;
+        ctx.fill();
+     
+        if (showLines) {
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = Math.max(1, 1.5 * zoom);
+            ctx.stroke();
+        }
+        ctx.restore();
     }
-    ctx.restore();
-}
-
-// ═══════════════════════════════════════════════════════════════
-// Interaction
-// ═══════════════════════════════════════════════════════════════
-
-function resize() {
-    W = area.clientWidth;
-    H = area.clientHeight;
-    canvas.width = W * devicePixelRatio;
-    canvas.height = H * devicePixelRatio;
-    canvas.style.width = W + 'px';
-    canvas.style.height = H + 'px';
-    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
-    draw();
-}
-
-canvas.addEventListener('mousedown', e => {
-    dragging = true;
-    dragStartX = e.clientX;
-    dragStartY = e.clientY;
-    panStartX = panX;
-    panStartY = panY;
-});
-
-canvas.addEventListener('mousemove', e => {
-    if (!dragging) return;
-    panX = panStartX + (e.clientX - dragStartX) / zoom;
-    panY = panStartY + (e.clientY - dragStartY) / zoom;
-    draw();
-});
-
-canvas.addEventListener('mouseup', () => dragging = false);
-canvas.addEventListener('mouseleave', () => dragging = false);
-
-canvas.addEventListener('wheel', e => {
-    e.preventDefault();
-    const factor = e.deltaY < 0 ? 1.1 : 0.9;
-    zoom = Math.max(0.2, Math.min(8, zoom * factor));
-    draw();
-}, { passive: false });
-
-// Touch support
-let lastTouchDist = null;
-canvas.addEventListener('touchstart', e => {
-    if (e.touches.length === 1) {
+     
+    // ═══════════════════════════════════════════════════════════════
+    // Interaction
+    // ═══════════════════════════════════════════════════════════════
+     
+    function resize() {
+        W = area.clientWidth;
+        H = area.clientHeight;
+        canvas.width = W * devicePixelRatio;
+        canvas.height = H * devicePixelRatio;
+        canvas.style.width = W + 'px';
+        canvas.style.height = H + 'px';
+        ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+        draw();
+    }
+     
+    canvas.addEventListener('mousedown', e => {
         dragging = true;
-        dragStartX = e.touches[0].clientX;
-        dragStartY = e.touches[0].clientY;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
         panStartX = panX;
         panStartY = panY;
-    } else if (e.touches.length === 2) {
-        lastTouchDist = Math.hypot(
-            e.touches[0].clientX - e.touches[1].clientX,
-            e.touches[0].clientY - e.touches[1].clientY
-        );
-    }
-    e.preventDefault();
-}, { passive: false });
-
-canvas.addEventListener('touchmove', e => {
-    if (e.touches.length === 1 && dragging) {
-        panX = panStartX + (e.touches[0].clientX - dragStartX) / zoom;
-        panY = panStartY + (e.touches[0].clientY - dragStartY) / zoom;
-        draw();
-    } else if (e.touches.length === 2 && lastTouchDist) {
-        const newDist = Math.hypot(
-            e.touches[0].clientX - e.touches[1].clientX,
-            e.touches[0].clientY - e.touches[1].clientY
-        );
-        zoom = Math.max(0.2, Math.min(8, zoom * (newDist / lastTouchDist)));
-        lastTouchDist = newDist;
-        draw();
-    }
-    e.preventDefault();
-}, { passive: false });
-
-canvas.addEventListener('touchend', () => { dragging = false; lastTouchDist = null; });
-
-window.addEventListener('resize', resize);
-
-// ═══════════════════════════════════════════════════════════════
-// Init
-// ═══════════════════════════════════════════════════════════════
-
-function autoFitZoom() {
-    if (vertexPositions.length === 0) return;
-    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-    vertexPositions.forEach(p => {
-        minX = Math.min(minX, p.x);
-        maxX = Math.max(maxX, p.x);
-        minY = Math.min(minY, p.y);
-        maxY = Math.max(maxY, p.y);
     });
-    const margin = (gridData.a || 100) * 1.5;
-    const spanX = (maxX - minX) + margin * 2;
-    const spanY = (maxY - minY) + margin * 2;
-    zoom = Math.min(W / spanX, H / spanY) * 0.9;
-    zoom = Math.max(0.2, Math.min(8, zoom));
-    panX = -(minX + maxX) / 2;
-    panY = -(minY + maxY) / 2;
-}
-
-buildNetwork();
-document.getElementById('valRUs').textContent = sectorRUs.length;
-resize();
-autoFitZoom();
-draw();
-</script>
-</body>
-</html>
+     
+    canvas.addEventListener('mousemove', e => {
+        if (!dragging) return;
+        panX = panStartX + (e.clientX - dragStartX) / zoom;
+        panY = panStartY + (e.clientY - dragStartY) / zoom;
+        draw();
+    });
+     
+    canvas.addEventListener('mouseup', () => dragging = false);
+    canvas.addEventListener('mouseleave', () => dragging = false);
+     
+    canvas.addEventListener('wheel', e => {
+        e.preventDefault();
+        const factor = e.deltaY < 0 ? 1.1 : 0.9;
+        zoom = Math.max(0.2, Math.min(8, zoom * factor));
+        draw();
+    }, { passive: false });
+     
+    // Touch support
+    let lastTouchDist = null;
+    canvas.addEventListener('touchstart', e => {
+        if (e.touches.length === 1) {
+            dragging = true;
+            dragStartX = e.touches[0].clientX;
+            dragStartY = e.touches[0].clientY;
+            panStartX = panX;
+            panStartY = panY;
+        } else if (e.touches.length === 2) {
+            lastTouchDist = Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+            );
+        }
+        e.preventDefault();
+    }, { passive: false });
+     
+    canvas.addEventListener('touchmove', e => {
+        if (e.touches.length === 1 && dragging) {
+            panX = panStartX + (e.touches[0].clientX - dragStartX) / zoom;
+            panY = panStartY + (e.touches[0].clientY - dragStartY) / zoom;
+            draw();
+        } else if (e.touches.length === 2 && lastTouchDist) {
+            const newDist = Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+            );
+            zoom = Math.max(0.2, Math.min(8, zoom * (newDist / lastTouchDist)));
+            lastTouchDist = newDist;
+            draw();
+        }
+        e.preventDefault();
+    }, { passive: false });
+     
+    canvas.addEventListener('touchend', () => { dragging = false; lastTouchDist = null; });
+     
+    window.addEventListener('resize', resize);
+     
+    // ═══════════════════════════════════════════════════════════════
+    // Init
+    // ═══════════════════════════════════════════════════════════════
+     
+    function autoFitZoom() {
+        if (vertexPositions.length === 0) return;
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        vertexPositions.forEach(p => {
+            minX = Math.min(minX, p.x);
+            maxX = Math.max(maxX, p.x);
+            minY = Math.min(minY, p.y);
+            maxY = Math.max(maxY, p.y);
+        });
+        const margin = (gridData.a || 100) * 1.5;
+        const spanX = (maxX - minX) + margin * 2;
+        const spanY = (maxY - minY) + margin * 2;
+        zoom = Math.min(W / spanX, H / spanY) * 0.9;
+        zoom = Math.max(0.2, Math.min(8, zoom));
+        panX = -(minX + maxX) / 2;
+        panY = -(minY + maxY) / 2;
+    }
+     
+    buildNetwork();
+    document.getElementById('valRUs').textContent = sectorRUs.length;
+    resize();
+    autoFitZoom();
+    draw();
+    </script>
+    </body>
+    </html>
